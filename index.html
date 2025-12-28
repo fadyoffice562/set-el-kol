@@ -1,0 +1,2791 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>منصة ست الكل - بناء وإدارة مراكز مصادر التعلم</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <style>
+    /* ================ المتغيرات والألوان ================ */
+    :root {
+      --bg-color: #121212;
+      --card-bg: rgba(255, 255, 255, 0.05);
+      --border-color: rgba(255, 255, 255, 0.1);
+      --text-light: #e0e0e0;
+      --primary-neon: linear-gradient(45deg, #a453ff, #54aaff);
+      --accent-orange: #ff6b35;
+      --accent-orange-hover: #e05a2a;
+      --shadow-purple: rgba(164, 83, 255, 0.5);
+      --shadow-orange: rgba(255, 107, 53, 0.5);
+    }
+
+    :root.day-mode {
+      --bg-color: #1b405f;
+      --card-bg: rgba(255, 255, 255, 0.7);
+      --border-color: rgba(130, 130, 255, 0.2);
+      --text-light: #ec6211;
+      --primary-neon: linear-gradient(45deg, #ffffff, #ffffff);
+      --accent-orange: #e65c00;
+      --accent-orange-hover: #cc5200;
+      --shadow-purple: rgb(255, 255, 255);
+      --shadow-orange: rgba(230, 92, 0, 0.592);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-light);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      padding-bottom: 80px;
+      transition: background-color 0.4s, color 0.4s;
+    }
+
+    /* ================ الهيدر ================ */
+    .site-header {
+      text-align: center;
+      padding: 1.5rem 1rem;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+
+    .neon-title {
+      background: var(--primary-neon);
+      -webkit-background-clip: text;
+      color: transparent;
+      font-size: 3rem;
+      font-weight: 800;
+      text-shadow: 0 0 15px var(--shadow-purple);
+      margin: 0;
+      letter-spacing: 1.5px;
+    }
+
+    .slogan {
+      color: var(--text-light);
+      font-size: 1.1rem;
+      opacity: 0.85;
+      margin-top: 6px;
+      font-weight: 500;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 6px;
+      display: inline-block;
+    }
+
+    /* ================ زر تبديل الوضع ================ */
+    .theme-toggle-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1000;
+      background: var(--accent-orange);
+      color: white;
+      border: none;
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      box-shadow: 0 4px 15px var(--shadow-orange);
+      transition: all 0.3s ease;
+    }
+
+    .theme-toggle-btn:hover {
+      background: var(--accent-orange-hover);
+      transform: translateY(-3px) rotate(15deg);
+    }
+
+    /* ================ التنقل بين الصفحات ================ */
+    .main-nav {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin: 2rem auto;
+      max-width: 800px;
+      flex-wrap: wrap;
+      padding: 0 1rem;
+    }
+
+    .nav-tab {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 12px 24px;
+      color: var(--text-light);
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-tab:hover {
+      background: rgba(255, 107, 53, 0.1);
+      transform: translateY(-3px);
+    }
+
+    .nav-tab.active {
+      background: var(--accent-orange);
+      color: white;
+      box-shadow: 0 4px 15px var(--shadow-orange);
+    }
+
+    /* ================ صفحة الملخص والمنهج ================ */
+    .summary-page {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
+    .chapter-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      backdrop-filter: blur(10px);
+    }
+
+    .chapter-title {
+      color: var(--accent-orange);
+      font-size: 1.8rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-title {
+      color: var(--text-light);
+      font-size: 1.4rem;
+      margin: 1.5rem 0 1rem;
+      padding-right: 1rem;
+      border-right: 4px solid var(--accent-orange);
+    }
+
+    .content-box {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .definition-item {
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px dashed var(--border-color);
+    }
+
+    .definition-item:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+    }
+
+    .definition-item strong {
+      color: var(--accent-orange);
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    ul.arabic-list {
+      list-style-type: arabic-indic;
+      padding-right: 1.5rem;
+      margin: 1rem 0;
+    }
+
+    ul.arabic-list li {
+      margin-bottom: 0.8rem;
+      line-height: 1.6;
+    }
+
+    /* ================ الكروت ================ */
+    .cards-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1.5rem;
+      padding: 0 1rem;
+    }
+
+    .card-section {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 2rem;
+      text-align: center;
+      transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
+      backdrop-filter: blur(10px);
+      width: 100%;
+      max-width: 350px;
+      cursor: pointer;
+    }
+
+    .card-section:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 10px 30px var(--shadow-orange);
+      background: rgba(255, 107, 53, 0.1);
+    }
+
+    .card-section i {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      color: var(--accent-orange);
+    }
+
+    .card-section h3 {
+      font-size: 1.4rem;
+      margin-bottom: 0.8rem;
+      color: var(--text-light);
+    }
+
+    .card-section p {
+      opacity: 0.8;
+      font-size: 0.95rem;
+    }
+
+    /* ================ صفحة الأسئلة الاختيارية ================ */
+    .quiz-container {
+      max-width: 700px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      display: none;
+    }
+
+    .question-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 2rem;
+      backdrop-filter: blur(10px);
+    }
+
+    .question-counter {
+      background: rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(8px);
+      border-radius: 20px;
+      padding: 8px 16px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 1.2rem;
+      display: inline-block;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      color: var(--text-light);
+    }
+
+    :root.day-mode .question-counter {
+      background: rgba(255, 255, 255, 0.4);
+      color: #e65c00;
+      border-color: rgba(130, 130, 255, 0.3);
+    }
+
+    .question-text {
+      font-size: 1.4rem;
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .option-btn {
+      background: rgba(255, 255, 255, 0.12);
+      border: none;
+      border-radius: 14px;
+      padding: 14px 20px;
+      text-align: right;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      width: 100%;
+      color: var(--text-light);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    .option-btn:hover {
+      background: rgba(255, 255, 255, 0.22);
+      transform: translateX(4px);
+    }
+
+    .option-btn:active {
+      transform: scale(0.98) translateX(2px);
+      background: rgba(255, 255, 255, 0.3) !important;
+    }
+
+    .option-btn.correct {
+      background: rgba(46, 125, 50, 0.35);
+      color: #c8e6c9;
+      border-left: 4px solid #4caf50;
+      box-shadow: inset 0 0 12px rgba(76, 175, 80, 0.2);
+    }
+
+    .option-btn.incorrect {
+      background: rgba(183, 28, 28, 0.35);
+      color: #ffcdd2;
+      border-left: 4px solid #f44336;
+      box-shadow: inset 0 0 12px rgba(244, 67, 54, 0.2);
+    }
+
+    :root.day-mode .option-btn {
+      background: rgba(255, 255, 255, 0.5);
+      color: #1b405f;
+    }
+
+    :root.day-mode .option-btn:hover {
+      background: rgba(255, 255, 255, 0.7);
+    }
+
+    :root.day-mode .option-btn.correct {
+      background: rgba(76, 175, 80, 0.25);
+      color: #2e7d32;
+    }
+
+    :root.day-mode .option-btn.incorrect {
+      background: rgba(244, 67, 54, 0.2);
+      color: #c62828;
+    }
+
+    .explanation {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+      font-size: 1rem;
+      line-height: 1.5;
+      display: none;
+    }
+
+    .btn-next {
+      display: none;
+      background: var(--accent-orange);
+      color: white;
+      border: none;
+      border-radius: 30px;
+      padding: 12px 30px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-top: 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-next:hover {
+      background: var(--accent-orange-hover);
+      transform: scale(1.05);
+      box-shadow: 0 5px 15px var(--shadow-orange);
+    }
+
+    /* ================ صفحة الأسئلة المقالية ================ */
+    .essay-container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      display: none;
+    }
+
+    .essay-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 2rem;
+      backdrop-filter: blur(10px);
+    }
+
+    .essay-question {
+      font-size: 1.4rem;
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+      color: var(--text-light);
+    }
+
+    .essay-textarea {
+      width: 100%;
+      min-height: 150px;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      color: var(--text-light);
+      font-size: 1.1rem;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      resize: vertical;
+      margin-bottom: 1rem;
+    }
+
+    .essay-textarea:focus {
+      outline: none;
+      border-color: var(--accent-orange);
+      box-shadow: 0 0 0 2px rgba(255, 107, 53, 0.3);
+    }
+
+    .model-answer {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+      font-size: 1rem;
+      line-height: 1.5;
+      display: none;
+    }
+
+    .model-answer h4 {
+      color: var(--accent-orange);
+      margin-bottom: 0.5rem;
+      font-size: 1.2rem;
+    }
+
+    .btn-check {
+      background: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 30px;
+      padding: 12px 30px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: inline-block;
+    }
+
+    .btn-check:hover {
+      background: #3d8b40;
+      transform: scale(1.05);
+    }
+
+    .essay-nav {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 2rem;
+    }
+
+    /* ================ صفحة النتائج ================ */
+    .results-container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      display: none;
+    }
+
+    .result-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 2rem;
+      backdrop-filter: blur(10px);
+    }
+
+    .result-summary h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .result-item {
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px dashed var(--border-color);
+    }
+
+    .result-item:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .result-question {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .result-answer {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-weight: 600;
+      margin-left: 0.5rem;
+    }
+
+    .answer-correct {
+      background: rgba(76, 175, 80, 0.2);
+      color: #a5d6a7;
+    }
+
+    .answer-incorrect {
+      background: rgba(244, 67, 54, 0.2);
+      color: #ef9a9a;
+    }
+
+    .result-explanation {
+      margin-top: 0.5rem;
+      font-size: 0.95rem;
+      opacity: 0.9;
+    }
+
+    .btn-download,
+    .btn-action {
+      display: block;
+      background: var(--accent-orange);
+      color: white;
+      border: none;
+      border-radius: 30px;
+      padding: 14px 30px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin: 2rem auto 0;
+      cursor: pointer;
+      transition: all 0.3s;
+      max-width: 300px;
+      text-align: center;
+    }
+
+    .btn-download:hover,
+    .btn-action:hover {
+      background: var(--accent-orange-hover);
+      transform: scale(1.05);
+      box-shadow: 0 5px 15px var(--shadow-orange);
+    }
+
+    .btn-restart {
+      background: #4caf50 !important;
+      max-width: 200px;
+    }
+
+    .btn-home {
+      background: #2196f3 !important;
+      max-width: 200px;
+    }
+
+    /* ================ الفوتر ================ */
+    footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(10px);
+      text-align: center;
+      padding: 12px;
+      font-size: 0.95rem;
+      z-index: 900;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .designer-btn {
+      display: inline-block;
+      background: var(--accent-orange);
+      color: white !important;
+      padding: 8px 20px;
+      border-radius: 30px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s;
+      margin-top: 5px;
+    }
+
+    .designer-btn:hover {
+      background: var(--accent-orange-hover);
+      transform: scale(1.05);
+      box-shadow: 0 5px 15px var(--shadow-orange);
+    }
+
+    /* ================ التنقل ================ */
+    .navigation-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .nav-btn {
+      background: var(--accent-orange);
+      color: white;
+      border: none;
+      border-radius: 30px;
+      padding: 12px 24px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-btn:hover {
+      background: var(--accent-orange-hover);
+      transform: translateY(-2px);
+    }
+
+    .nav-btn.secondary {
+      background: #6c757d;
+    }
+
+    .nav-btn.secondary:hover {
+      background: #5a6268;
+    }
+
+    /* ================ Responsive ================ */
+    @media (max-width: 768px) {
+      .neon-title { font-size: 2.2rem; }
+      .main-nav { flex-direction: column; align-items: center; }
+      .nav-tab { width: 100%; max-width: 300px; }
+      .card-section { padding: 1.5rem; }
+      .question-text, .essay-question { font-size: 1.2rem; }
+      .option-btn { padding: 12px 16px; font-size: 1rem; }
+      .btn-next, .btn-download, .nav-btn { width: 100%; max-width: none; }
+      .essay-textarea { min-height: 120px; }
+      .chapter-card { padding: 1.5rem; }
+      .chapter-title { font-size: 1.5rem; }
+    }
+
+    .card-container {
+      position: relative;
+    }
+
+    .back-to-home-btn {
+      position: absolute;
+      top: 20px;        
+      left: 20px;        
+      z-index: 10;
+      background: var(--accent-orange);
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 30px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;  
+      box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+      transition: all 0.3s ease;
+      display: flex;    
+      align-items: center;
+      gap: 8px;
+    }
+
+    .back-to-home-btn:hover {
+      background: #e05a2a;
+      box-shadow: 0 6px 18px rgba(255, 107, 53, 0.4);
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 480px) {
+      .back-to-home-btn {
+        top: 10px;
+        left: 10px;
+        padding: 8px 14px;
+        font-size: 0.8rem;
+      }
+    }
+
+    /* ================ التقدم ================ */
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      margin: 1rem 0;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--accent-orange);
+      border-radius: 4px;
+      transition: width 0.3s ease;
+    }
+
+    .progress-text {
+      text-align: center;
+      font-size: 0.9rem;
+      opacity: 0.8;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- الصفحة الرئيسية -->
+  <div id="homePage">
+    <header class="site-header">
+      <h1 class="neon-title">منصة ست الكل</h1>
+      <div class="slogan">بناء وإدارة مراكز مصادر التعلم</div>
+    </header>
+
+    <!-- التنقل بين الصفحات -->
+    <nav class="main-nav">
+      <a href="#" class="nav-tab active" onclick="showPage('summary'); return false;">
+        <i class="fas fa-book"></i> الملخص والمنهج
+      </a>
+      <a href="#" class="nav-tab" onclick="showPage('tests'); return false;">
+        <i class="fas fa-graduation-cap"></i> الاختبارات
+      </a>
+    </nav>
+
+    <!-- صفحة الملخص والمنهج -->
+    <div id="summaryPage" class="summary-page">
+      <!-- الفصل الأول -->
+      <div class="chapter-card">
+        <h2 class="chapter-title"><i class="fas fa-flag"></i> الفصل الأول: مفاهيم أساسية</h2>
+        
+        <div class="content-box">
+          <h3 class="section-title">تعريف مركز مصادر التعلم</h3>
+          <div class="definition-item">
+            <strong>التعريف الشامل:</strong>
+            هو وحدة تعليمية متكاملة تحتوي على أنواع متعددة من مصادر المعلومات التقليدية والإلكترونية، تُنظم وتُقدم بشكل يخدم العملية التعليمية ويدعم المناهج الدراسية.
+          </div>
+          
+          <h3 class="section-title">أهداف مركز مصادر التعلم</h3>
+          <ul class="arabic-list">
+            <li>دعم المناهج الدراسية وتكملة ما يقدم في الفصول الدراسية</li>
+            <li>تنمية مهارات البحث والاستكشاف والتفكير النقدي لدى الطلاب</li>
+            <li>توفير بيئة تعلم تفاعلية تشجع على التعلم الذاتي والمستمر</li>
+            <li>تنمية عادة القراءة والاطلاع وتشجيع الاهتمام بالمطالعة</li>
+            <li>تدريب المستفيدين على استخدام التقنيات الحديثة في البحث والتعلم</li>
+            <li>دعم التعلم التعاوني والعمل الجماعي بين الطلاب</li>
+            <li>توفير مصادر تعلم متنوعة تناسب الفروق الفردية بين المتعلمين</li>
+          </ul>
+        </div>
+
+        <div class="content-box">
+          <h3 class="section-title">مكونات مركز مصادر التعلم</h3>
+          <div class="definition-item">
+            <strong>1. القسم السمعي البصري:</strong> يحتوي على أجهزة العرض، التلفزيون التعليمي، أجهزة التسجيل، الأفلام التعليمية.
+          </div>
+          <div class="definition-item">
+            <strong>2. قسم الحاسوب والوسائط المتعددة:</strong> يحتوي على أجهزة حاسوب، برامج تعليمية، أنترنت، أقراص مدمجة تعليمية.
+          </div>
+          <div class="definition-item">
+            <strong>3. قسم المطبوعات:</strong> كتب، دوريات، مطبوعات، مراجع، معاجم، موسوعات.
+          </div>
+          <div class="definition-item">
+            <strong>4. قسم الوسائل التعليمية:</strong> خرائط، مجسمات، عينات، نماذج، لوحات.
+          </div>
+        </div>
+      </div>
+
+      <!-- الفصل الثاني -->
+      <div class="chapter-card">
+        <h2 class="chapter-title"><i class="fas fa-cogs"></i> الفصل الثاني: التصميم والتخطيط</h2>
+        
+        <div class="content-box">
+          <h3 class="section-title">معايير تصميم المركز</h3>
+          <ul class="arabic-list">
+            <li><strong>المساحة:</strong> 2-2.5 متر مربع لكل طالب، مع مراعاة المساحات الإضافية للممرات والأقسام</li>
+            <li><strong>الموقع:</strong> مكان مركزي يسهل الوصول إليه، بعيد عن مصادر الضوضاء</li>
+            <li><strong>التقسيم الداخلي:</strong> تخصيص مناطق للقراءة الفردية، العمل الجماعي، استخدام الحاسوب</li>
+            <li><strong>الإضاءة:</strong> إضاءة طبيعية وصناعية كافية ومناسبة للقراءة (300-500 لوكس)</li>
+            <li><strong>التهوية:</strong> نظام تهوية جيد يحافظ على نقاء الهواء وراحة المستفيدين</li>
+            <li><strong>الأثاث:</strong> أثاث مريح، قابل للتعديل، متنوع حسب الاحتياجات</li>
+            <li><strong>الألوان:</strong> ألوان هادئة ومريحة للأعصاب (ألوان فاتحة)</li>
+          </ul>
+        </div>
+
+        <div class="content-box">
+          <h3 class="section-title">خطوات التخطيط للمركز</h3>
+          <div class="definition-item">
+            <strong>المرحلة الأولى: الدراسة والتحليل</strong>
+            <ul class="arabic-list">
+              <li>دراسة احتياجات المستفيدين (طلاب، معلمين، إداريين)</li>
+              <li>تحليل المناهج الدراسية وتحديد الاحتياجات المعلوماتية</li>
+              <li>دراسة الموارد المتاحة (مادية، بشرية، مالية)</li>
+            </ul>
+          </div>
+          
+          <div class="definition-item">
+            <strong>المرحلة الثانية: التصميم الهندسي</strong>
+            <ul class="arabic-list">
+              <li>تحديد المساحة الكلية وتوزيع المساحات الداخلية</li>
+              <li>تصميم نظام الإضاءة والتهوية</li>
+              <li>تخطيط مواقع الأقسام المختلفة</li>
+              <li>تحديد مواقع المخارج وأماكن السلامة</li>
+            </ul>
+          </div>
+          
+          <div class="definition-item">
+            <strong>المرحلة الثالثة: تجهيز المركز</strong>
+            <ul class="arabic-list">
+              <li>شراء الأثاث والمعدات</li>
+              <li>توفير المصادر المعلوماتية</li>
+              <li>تركيب الأجهزة والتقنيات</li>
+              <li>تنظيم المصادر وفهرستها</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- الفصل الثالث -->
+      <div class="chapter-card">
+        <h2 class="chapter-title"><i class="fas fa-users"></i> الفصل الثالث: الإدارة والتشغيل</h2>
+        
+        <div class="content-box">
+          <h3 class="section-title">مهام أمين مركز مصادر التعلم</h3>
+          <ul class="arabic-list">
+            <li><strong>مهام تنظيمية:</strong> تنظيم المصادر، الفهرسة، التصنيف، الترتيب</li>
+            <li><strong>مهام خدمية:</strong> مساعدة المستفيدين، الإرشاد، التدريب، الإعارة</li>
+            <li><strong>مهام تطويرية:</strong> تطوير المجموعات، تحديث المصادر، التطوير المهني</li>
+            <li><strong>مهام إدارية:</strong> إعداد التقارير، المتابعة، التقييم، التخطيط</li>
+            <li><strong>مهام تقنية:</strong> صيانة الأجهزة، تحديث البرامج، إدارة الشبكات</li>
+            <li><strong>مهام تعليمية:</strong> تنظيم ورش العمل، إعداد الدروس النموذجية، التدريب</li>
+          </ul>
+        </div>
+
+        <div class="content-box">
+          <h3 class="section-title">نظم الإعارة والتداول</h3>
+          <div class="definition-item">
+            <strong>1. الإعارة الداخلية:</strong> استخدام المصادر داخل المركز فقط
+          </div>
+          <div class="definition-item">
+            <strong>2. الإعارة الخارجية:</strong> استعارة المصادر خارج المركز لفترة محددة
+          </div>
+          <div class="definition-item">
+            <strong>3. نظام الإعارة الإلكتروني:</strong> استخدام برامج متخصصة لتسجيل عمليات الإعارة
+          </div>
+          <div class="definition-item">
+            <strong>4. سياسات الإعارة:</strong> تحديد فترة الإعارة، عدد المصادر، الغرامات، الاستثناءات
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- صفحة الاختبارات -->
+    <div id="testsPage" style="display: none;">
+      <div class="cards-container">
+        <div class="card-section" onclick="startQuiz('quiz1')">
+          <i class="fas fa-brain"></i>
+          <h3>🟢 المستوى: المفهوم والأسس</h3>
+          <p>"الفصل الأول"<br>
+            <small>40 سؤال اختياري + 3 أسئلة مقالية</small><br>
+            <small>المفاهيم الأساسية - أهداف المركز - المكونات</small>
+          </p>
+        </div>
+
+        <div class="card-section" onclick="startQuiz('quiz2')">
+          <i class="fas fa-tools"></i>
+          <h3>🟠 المستوى: التصميم والتخطيط</h3>
+          <p>"الفصل الثاني"<br>
+            <small>40 سؤال اختياري + 3 أسئلة مقالية</small><br>
+            <small>التصميم - التخطيط - المعايير - الخطوات</small>
+          </p>
+        </div>
+
+        <div class="card-section" onclick="startQuiz('quiz3')">
+          <i class="fas fa-users"></i>
+          <h3>🔴 المستوى: الإدارة والتشغيل</h3>
+          <p>"الفصل الثالث"<br>
+            <small>40 سؤال اختياري + 3 أسئلة مقالية</small><br>
+            <small>الإدارة - التشغيل - مهام الأمين - نظم الإعارة</small>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- صفحة الأسئلة الاختيارية -->
+  <div id="quizContainer" class="quiz-container">
+    <div class="question-card">
+      <a href="#" class="back-to-home-btn" onclick="goHome(); return false;">
+        <i class="fas fa-arrow-right"></i> العودة للرئيسية
+      </a>
+
+      <div class="question-counter">
+        📝 السؤال <span id="qNumber">1</span> من <span id="qTotal">40</span>
+      </div>
+
+      <div class="progress-bar">
+        <div class="progress-fill" id="quizProgress"></div>
+      </div>
+      <div class="progress-text" id="progressText">التقدم: 0%</div>
+
+      <div id="qText" class="question-text">جارٍ التحميل...</div>
+
+      <div id="optionsContainer" class="options"></div>
+
+      <div id="explanation" class="explanation"></div>
+
+      <div style="display: flex; justify-content: space-between; margin-top: 2rem;">
+        <button id="btnNext" class="btn-next" onclick="nextQuestion()">التالي</button>
+        <button class="nav-btn secondary" onclick="showEssayQuestions()">
+          <i class="fas fa-pen"></i> الانتقال للأسئلة المقالية
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- صفحة الأسئلة المقالية -->
+  <div id="essayContainer" class="essay-container">
+    <div class="essay-card">
+      <a href="#" class="back-to-home-btn" onclick="goHome(); return false;">
+        <i class="fas fa-arrow-right"></i> العودة للرئيسية
+      </a>
+
+      <div class="question-counter">
+        📝 السؤال المقالي <span id="eNumber">1</span> من <span id="eTotal">3</span>
+      </div>
+
+      <div class="progress-bar">
+        <div class="progress-fill" id="essayProgress"></div>
+      </div>
+      <div class="progress-text" id="essayProgressText">التقدم: 0%</div>
+
+      <div id="eText" class="essay-question">جارٍ التحميل...</div>
+
+      <textarea id="essayAnswer" class="essay-textarea" 
+                placeholder="اكتب إجابتك هنا... يمكنك كتابة فقرات متعددة وتنظيم إجابتك كما تريد"></textarea>
+
+      <div id="modelAnswer" class="model-answer"></div>
+
+      <div class="essay-nav">
+        <button class="nav-btn" onclick="prevEssayQuestion()">
+          <i class="fas fa-arrow-right"></i> السابق
+        </button>
+        
+        <button id="btnCheck" class="btn-check" onclick="checkEssayAnswer()">
+          <i class="fas fa-check"></i> تحقق من الإجابة
+        </button>
+        
+        <button class="nav-btn" onclick="nextEssayQuestion()">
+          التالي <i class="fas fa-arrow-left"></i>
+        </button>
+      </div>
+
+      <div class="navigation-buttons">
+        <button class="nav-btn secondary" onclick="showMultipleChoice()">
+          <i class="fas fa-list-ol"></i> العودة للأسئلة الاختيارية
+        </button>
+        <button class="nav-btn" onclick="finishQuiz()">
+          <i class="fas fa-flag-checkered"></i> إنهاء الاختبار وعرض النتائج
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- صفحة النتائج -->
+  <div id="resultsContainer" class="results-container">
+    <div class="result-card">
+      <h2 id="resultQuizTitle">نتائجك في اختبار ...</h2>
+      <div id="resultsList"></div>
+    </div>
+  </div>
+
+  <footer>
+    <div></div>
+    <a href="#" class="designer-btn" onclick="return false;">
+      <i class="fas fa-code"></i> جميع الحقوق محفوظة للمصمم MR FADY
+    </a>
+  </footer>
+
+  <script>
+    // ================ البيانات الكاملة من الكتاب ================
+    const quizzes = {
+      quiz1: {
+        title: "المستوى الأول - المفهوم والأسس (الفصل 1)",
+        mcq: [
+          {
+            q: "ما هو التعريف الأكثر دقة لمركز مصادر التعلم؟",
+            options: [
+              "مكتبة مدرسية تحتوي على الكتب الدراسية فقط",
+              "وحدة تعليمية تحتوي على مصادر معلومات متنوعة لدعم العملية التعليمية",
+              "معمل حاسوب مزود بأجهزة حديثة",
+              "قاعة للأنشطة الطلابية والمسابقات"
+            ],
+            correct: 1,
+            explanation: "مركز مصادر التعلم هو وحدة تعليمية متكاملة تحتوي على أنواع متعددة من مصادر المعلومات التقليدية والإلكترونية التي تدعم العملية التعليمية."
+          },
+          {
+            q: "أي من الأهداف التالية ليس من أهداف مركز مصادر التعلم؟",
+            options: [
+              "دعم المناهج الدراسية",
+              "تنمية مهارات البحث والاستكشاف",
+              "تحقيق الربح المادي",
+              "تشجيع التعلم الذاتي"
+            ],
+            correct: 2,
+            explanation: "مركز مصادر التعلم مؤسسة تعليمية خدمية وليست تجارية، وهدفها الأساسي دعم العملية التعليمية وليس تحقيق الربح."
+          },
+          {
+            q: "من المكونات الأساسية لمركز مصادر التعلم الحديث:",
+            options: [
+              "قسم المطبوعات فقط",
+              "قسم الوسائط المتعددة فقط",
+              "القسم السمعي البصري فقط",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "المركز الحديث يشمل جميع المكونات: قسم المطبوعات، قسم الوسائط المتعددة، القسم السمعي البصري، وقسم الوسائل التعليمية."
+          },
+          {
+            q: "ما أهمية تنوع المصادر في المركز؟",
+            options: [
+              "لتلبية احتياجات متعلمين مختلفين",
+              "لجذب أكبر عدد من المستفيدين",
+              "لإظهار ثراء المركز",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "تنوع المصادر مهم لتلبية احتياجات متعلمين مختلفين، جذب المستفيدين، وإظهار ثراء المركز."
+          },
+          {
+            q: "ما هو الفرق بين المركز والمكتبة التقليدية؟",
+            options: [
+              "المركز يشمل مصادر متنوعة بينما المكتبة تركز على المطبوعات",
+              "المركز أصغر حجماً",
+              "المركز لا يحتوي على كتب",
+              "لا فرق بينهما"
+            ],
+            correct: 0,
+            explanation: "المركز يشمل أنواعاً متعددة من المصادر بينما تركز المكتبة التقليدية على المطبوعات."
+          },
+          {
+            q: "ما دور المركز في التعلم التعاوني؟",
+            options: [
+              "بتوفير مساحات للعمل الجماعي",
+              "بتقديم مصادر تدعم العمل الجماعي",
+              "بتنظيم أنشطة جماعية",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "يساهم المركز في التعلم التعاوني بتوفير مساحات عمل جماعي، مصادر تدعمه، وتنظيم أنشطة جماعية."
+          },
+          {
+            q: "كيف يساهم المركز في تنمية عادة القراءة؟",
+            options: [
+              "بتوفير كتب متنوعة وجذابة",
+              "بتنظيم مسابقات قرائية",
+              "بتشجيع النقاش حول الكتب",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "يساهم المركز في تنمية عادة القراءة بتوفير كتب متنوعة، تنظيم مسابقات، وتشجيع النقاش."
+          },
+          {
+            q: "ما هي المهارات التي ينميها المركز لدى الطلاب؟",
+            options: [
+              "مهارات البحث والاستكشاف",
+              "مهارات التفكير النقدي",
+              "مهارات التعلم الذاتي",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "ينمي المركز مهارات البحث والاستكشاف، التفكير النقدي، والتعلم الذاتي."
+          },
+          {
+            q: "كيف يساهم المركز في دعم المناهج الدراسية؟",
+            options: [
+              "بتوفير مصادر إضافية للموضوعات",
+              "بتقديم أنشطة موازية",
+              "بتدريب المعلمين",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "يساهم المركز بدعم المناهج بتوفير مصادر إضافية، أنشطة موازية، وتدريب المعلمين."
+          },
+          {
+            q: "ما هي مصادر التعلم الإلكترونية؟",
+            options: [
+              "الكتب الإلكترونية وقواعد البيانات",
+              "المواقع التعليمية",
+              "البرامج التعليمية",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "المصادر الإلكترونية تشمل الكتب الإلكترونية، قواعد البيانات، المواقع التعليمية، والبرامج التعليمية."
+          },
+          {
+            q: "كيف ينمي المركز مهارات القرن الحادي والعشرين؟",
+            options: [
+              "بتعليم القراءة فقط",
+              "بتنمية مهارات البحث والنقد والتفكير الإبداعي",
+              "بتوفير الألعاب فقط",
+              "بتقليل استخدام التكنولوجيا"
+            ],
+            correct: 1,
+            explanation: "ينمي المركز مهارات البحث، النقد، التفكير الإبداعي، والتعلم الذاتي التي تعتبر من مهارات القرن 21."
+          },
+          {
+            q: "ما هو مفهوم 'مصادر التعلم'؟",
+            options: [
+              "الكتب المدرسية فقط",
+              "أي مادة أو أداة تستخدم لدعم عملية التعلم",
+              "أجهزة الحاسوب فقط",
+              "السبورات الذكية"
+            ],
+            correct: 1,
+            explanation: "مصادر التعلم هي أي مادة أو أداة (تقليدية أو إلكترونية) تستخدم لدعم عملية التعلم والتعليم."
+          },
+          {
+            q: "ما هي الخصائص المميزة لمركز مصادر التعلم؟",
+            options: [
+              "الشمولية في المصادر",
+              "التكامل مع المناهج",
+              "المرونة في الاستخدام",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "يتميز المركز بالشمولية، التكامل مع المناهج، والمرونة في الاستخدام."
+          },
+          {
+            q: "كيف يحافظ المركز على خصوصية المستفيدين؟",
+            options: [
+              "بعدم الكشف عن سجلات الاستعارة",
+              "بحماية البيانات الشخصية",
+              "بتأمين قواعد البيانات",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "يجب الحفاظ على خصوصية المستفيدين بعدم الكشف عن سجلاتهم وحماية بياناتهم الشخصية."
+          },
+          {
+            q: "ما هي الفئة المستهدفة الرئيسية لمركز مصادر التعلم؟",
+            options: [
+              "الطلاب فقط",
+              "المعلمون فقط",
+              "الطلاب والمعلمون",
+              "الموظفون الإداريون فقط"
+            ],
+            correct: 2,
+            explanation: "الطلاب والمعلمون هم الفئة المستهدفة الرئيسية للمركز."
+          },
+          {
+            q: "ما هو دور المركز في عصر الرقمنة؟",
+            options: [
+              "بتوفير المصادر الرقمية",
+              "بتدريب على المهارات الرقمية",
+              "باستخدام التقنيات الحديثة",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "في عصر الرقمنة، يجب أن يوفر المركز مصادر رقمية ويدرب على المهارات الرقمية ويستخدم التقنيات الحديثة."
+          },
+          {
+            q: "كيف يوازن المركز بين المصادر التقليدية والإلكترونية؟",
+            options: [
+              "بتوفير كليهما حسب الاحتياج",
+              "بالتركيز على الإلكترونية فقط",
+              "بإلغاء التقليدية",
+              "بالتقليدية فقط"
+            ],
+            correct: 0,
+            explanation: "يجب توفير كلا النوعين من المصادر حسب احتياجات المستفيدين وطبيعة الموضوعات."
+          },
+          {
+            q: "ما أهمية وجود شبكة إنترنت في المركز؟",
+            options: [
+              "لتصفح مواقع التواصل الاجتماعي",
+              "للوصول إلى مصادر التعلم الإلكترونية",
+              "للمحادثة مع الأصدقاء",
+              "لتحميل الألعاب"
+            ],
+            correct: 1,
+            explanation: "شبكة الإنترنت تتيح الوصول إلى مصادر التعلم الإلكترونية وقواعد البيانات العالمية."
+          },
+          {
+            q: "ما هو دور المركز في دعم ذوي الاحتياجات الخاصة؟",
+            options: [
+              "توفير مصادر ووسائل مناسبة لهم",
+              "تعديل البيئة الفيزيائية",
+              "تدريب العاملين على التعامل معهم",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "يجب أن يوفر المركز مصادر مناسبة، يعدل البيئة، ويدرب العاملين لخدمة ذوي الاحتياجات الخاصة."
+          },
+          {
+            q: "ما أهمية نظام الفهرسة في المركز؟",
+            options: [
+              "لتنظيم المصادر وسهولة الوصول إليها",
+              "لزيادة عدد الكتب فقط",
+              "لإثبات الملكية",
+              "للتزيين"
+            ],
+            correct: 0,
+            explanation: "نظام الفهرسة مهم لتنظيم المصادر وتصنيفها مما يسهل الوصول إليها والاستفادة منها."
+          },
+          {
+            q: "ما أهمية المرونة في تنظيم المركز؟",
+            options: [
+              "لتلبية الاحتياجات المتغيرة",
+              "للاستجابة للتطورات التكنولوجية",
+              "للتكيف مع أعداد متغيرة من المستفيدين",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "المرونة مهمة لتلبية احتياجات متغيرة، الاستجابة للتطورات، والتكيف مع الأعداد المختلفة."
+          },
+          {
+            q: "ما أهمية التوثيق في أعمال المركز؟",
+            options: [
+              "للمساءلة والمتابعة",
+              "لتقييم الأداء",
+              "للتخطيط للتطوير",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "التوثيق مهم للمساءلة، متابعة الأعمال، تقييم الأداء، والتخطيط للتطوير المستقبلي."
+          },
+          {
+            q: "كيف يتعامل المركز مع الشكاوى والمقترحات؟",
+            options: [
+              "بتجاهلها",
+              "بتسجيلها والاستجابة لها",
+              "بعقاب الشاكي",
+              "برفضها جميعاً"
+            ],
+            correct: 1,
+            explanation: "يجب تسجيل الشكاوى والمقترحات والاستجابة لها لتحسين الخدمات."
+          },
+          {
+            q: "ما دور المركز في تنمية الوعي المعلوماتي؟",
+            options: [
+              "بتدريب المستفيدين على تقييم المعلومات",
+              "بتعليم مهارات البحث",
+              "بتنمية التفكير النقدي",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "ينمي المركز الوعي المعلوماتي بتدريب المستفيدين على تقييم المعلومات ومهارات البحث والتفكير النقدي."
+          },
+          {
+            q: "ما هي الفائدة التعليمية للمركز؟",
+            options: [
+              "تنمية مهارات البحث",
+              "تحسين التحصيل الدراسي",
+              "تشجيع القراءة",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "الفوائد التعليمية تشمل تنمية مهارات البحث، تحسين التحصيل الدراسي، وتشجيع القراءة."
+          },
+          {
+            q: "ما هي الصفات الواجب توفرها في أمين المركز؟",
+            options: [
+              "حب المعرفة والمساعدة",
+              "القدرة على التنظيم",
+              "المعرفة بالتكنولوجيا",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "يجب أن يجمع أمين المركز بين صفات عدة: حب المعرفة، القدرة على التنظيم، المعرفة بالتكنولوجيا."
+          },
+          {
+            q: "كيف يدعم المركز البحث العلمي للطلاب؟",
+            options: [
+              "بتوفير مصادر بحثية",
+              "بتدريب الطلاب على منهجية البحث",
+              "بتوفير مساحات للبحث",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "يدعم المركز البحث العلمي بتوفير مصادر، تدريب على المنهجية، وتوفير مساحات مناسبة للبحث."
+          },
+          {
+            q: "كيف يحافظ المركز على أمن المستفيدين؟",
+            options: [
+              "بتوفير إجراءات السلامة من الحريق",
+              "بمراقبة استخدام المصادر",
+              "بتدريب المستفيدين على الاستخدام الآمن",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "يجب أن يوفر المركز إجراءات السلامة، مراقبة الاستخدام، وتدريب المستفيدين على الاستخدام الآمن."
+          },
+          {
+            q: "ما أهمية المشاركة المجتمعية للمركز؟",
+            options: [
+              "لاكتساب الدعم المجتمعي",
+              "لزيادة الموارد",
+              "لتوسيع قاعدة المستفيدين",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "المشاركة المجتمعية مهمة لاكتساب الدعم، زيادة الموارد، وتوسيع قاعدة المستفيدين."
+          },
+          {
+            q: "كيف يدعم المركز التعلم الذاتي؟",
+            options: [
+              "بتوفير مصادر للتعلم الذاتي",
+              "بتقديم إرشادات للتعلم الذاتي",
+              "بتوفير مساحات للتعلم الفردي",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "يدعم المركز التعلم الذاتي بتوفير مصادر مناسبة، إرشادات، ومساحات للتعلم الفردي."
+          },
+          {
+            q: "ما هو دور أمين مركز مصادر التعلم؟",
+            options: [
+              "تنظيم المصادر وفهرستها",
+              "مساعدة المستفيدين في البحث",
+              "تطوير مجموعات المركز",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "أمين المركز مسؤول عن تنظيم المصادر، مساعدة المستفيدين، وتطوير مجموعات المركز."
+          },
+          {
+            q: "كيف يمكن تقييم فعالية المركز؟",
+            options: [
+              "بعدد الزوار فقط",
+              "بعدد الكتب فقط",
+              "بمدى تحقيق الأهداف ورضا المستفيدين",
+              "بحجم المركز فقط"
+            ],
+            correct: 2,
+            explanation: "تقييم الفعالية يكون بمدى تحقيق الأهداف التعليمية ودرجة رضا المستفيدين عن الخدمات."
+          },
+          {
+            q: "ما أهمية وجود خطة تطوير للمركز؟",
+            options: [
+              "للتجديد المستمر وتحسين الخدمات",
+              "لزيادة الميزانية فقط",
+              "للتقارير الإدارية فقط",
+              "لا أهمية لها"
+            ],
+            correct: 0,
+            explanation: "خطة التطوير ضرورية للتجديد المستمر وتحسين الخدمات وتلبية الاحتياجات المتغيرة."
+          },
+          {
+            q: "كيف يساهم المركز في تنمية المهارات الاجتماعية؟",
+            options: [
+              "بتوفير فرص للعمل الجماعي",
+              "بتنظيم أنشطة تفاعلية",
+              "بتعزيز التواصل بين الطلاب",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "يساهم المركز في تنمية المهارات الاجتماعية بتوفير فرص عمل جماعي، أنشطة تفاعلية، وتعزيز التواصل."
+          },
+          {
+            q: "ما هو تأثير المركز على البيئة التعليمية؟",
+            options: [
+              "تحويل التعليم من تلقيني إلى تفاعلي",
+              "توفير بيئة تعلم غنية",
+              "تشجيع الاستكشاف والاكتشاف",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "يؤثر المركز إيجابياً على البيئة التعليمية بتحويل التعليم إلى تفاعلي، توفير بيئة غنية، وتشجيع الاستكشاف."
+          },
+          {
+            q: "ما أهمية توفير مراجع حديثة في المركز؟",
+            options: [
+              "لتحديث معلومات الطلاب",
+              "لمواكبة التطورات العلمية",
+              "لضمان دقة المعلومات",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "المراجع الحديثة مهمة لتحديث معلومات الطلاب، مواكبة التطورات، وضمان دقة المعلومات."
+          },
+          {
+            q: "كيف يساهم المركز في تنمية التفكير الإبداعي؟",
+            options: [
+              "بتوفير مصادر متنوعة ومثيرة للتفكير",
+              "بتشجيع طرح الأسئلة والاستفسارات",
+              "بتنظيم مسابقات إبداعية",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "يساهم المركز في تنمية التفكير الإبداعي بتوفير مصادر متنوعة، تشجيع الأسئلة، وتنظيم مسابقات إبداعية."
+          },
+          {
+            q: "ما أهمية وجود نظام للإعارة في المركز؟",
+            options: [
+              "لتنظيم استخدام المصادر",
+              "لتتبع حركة الكتب",
+              "لضمان عودة المصادر في مواعيدها",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "نظام الإعارة مهم لتنظيم الاستخدام، تتبع الكتب، وضمان عودتها في المواعيد المحددة."
+          }
+        ],
+        essay: [
+          {
+            q: "عرف مركز مصادر التعلم واذكر أربعة من أهدافه الرئيسية مع شرح كل هدف.",
+            modelAnswer: "تعريف مركز مصادر التعلم:\nهو وحدة تعليمية متكاملة تحتوي على أنواع متعددة من مصادر المعلومات التقليدية والإلكترونية، تُنظم وتُقدم بشكل يخدم العملية التعليمية ويدعم المناهج الدراسية.\n\nأهداف المركز:\n1. دعم المناهج الدراسية: توفير مصادر معلومات إضافية تكمل ما يقدم في الفصول الدراسية.\n2. تنمية مهارات البحث: تدريب الطلاب على كيفية البحث عن المعلومات وتقييمها.\n3. تشجيع التعلم الذاتي: توفير بيئة تعزز التعلم المستقل والاستكشاف الذاتي.\n4. تنمية عادة القراءة: توفير كتب ومصادر جذابة تشجع على المطالعة.\n5. دعم التعلم التعاوني: توفير مساحات ومصادر تدعم العمل الجماعي.\n6. تنمية الوعي المعلوماتي: تعليم كيفية التعامل مع المعلومات في العصر الرقمي."
+          },
+          {
+            q: "ما هي مكونات مركز مصادر التعلم الحديث؟ وضح وظيفة كل مكون.",
+            modelAnswer: "مكونات مركز مصادر التعلم الحديث:\n\n1. قسم المطبوعات:\n   - الوظيفة: يحتوي على الكتب، الدوريات، المراجع، المعاجم، والموسوعات.\n   - الأهمية: توفير مصادر معلومات مطبوعة متنوعة.\n\n2. قسم الوسائط المتعددة:\n   - الوظيفة: يحتوي على أجهزة حاسوب، برامج تعليمية، أنترنت، أقراص مدمجة.\n   - الأهمية: توفير مصادر تعليمية تفاعلية وإلكترونية.\n\n3. القسم السمعي البصري:\n   - الوظيفة: يحتوي على أجهزة عرض، تلفزيون تعليمي، أجهزة تسجيل، أفلام تعليمية.\n   - الأهمية: تقديم المعلومات بأسلوب سمعي وبصري يجذب الانتباه.\n\n4. قسم الوسائل التعليمية:\n   - الوظيفة: يحتوي على خرائط، مجسمات، عينات، نماذج، لوحات.\n   - الأهمية: توضيح المفاهيم المجردة وتحويلها إلى أشياء ملموسة.\n\n5. قسم الأرشفة الرقمية:\n   - الوظيفة: حفظ المستندات والمواد التعليمية بشكل رقمي.\n   - الأهمية: الحفاظ على المصادر وتسهيل الوصول إليها."
+          },
+          {
+            q: "ما هي أهمية مركز مصادر التعلم في العملية التعليمية؟ اذكر خمس فوائد رئيسية.",
+            modelAnswer: "أهمية مركز مصادر التعلم في العملية التعليمية:\n\n1. تنمية المهارات البحثية:\n   - تعليم الطلاب كيفية البحث عن المعلومات.\n   - تدريبهم على استخدام مصادر المعلومات المختلفة.\n   - تنمية مهارات التقييم النقدي للمعلومات.\n\n2. دعم المناهج الدراسية:\n   - توفير مصادر إضافية للموضوعات الدراسية.\n   - تقديم أمثلة وتطبيقات عملية.\n   - إثراء المحتوى التعليمي.\n\n3. تشجيع التعلم الذاتي:\n   - توفير بيئة محفزة للتعلم المستقل.\n   - تمكين الطلاب من متابعة اهتماماتهم الشخصية.\n   - تنمية روح الاستكشاف والفضول العلمي.\n\n4. تنمية مهارات القرن الحادي والعشرين:\n   - مهارات التفكير النقدي والإبداعي.\n   - مهارات التواصل والتعاون.\n   - المهارات التكنولوجية والرقمية.\n\n5. دعم الفروق الفردية:\n   - توفير مصادر متنوعة تناسب أساليب تعلم مختلفة.\n   - مساعدة الطلاب ذوي الاحتياجات الخاصة.\n   - تقديم تعليم يتناسب مع قدرات وميول كل طالب.\n\n6. تنمية المجتمع المدرسي:\n   - خلق بيئة تعليمية غنية ومحفزة.\n   - تعزيز التواصل بين الطلاب والمعلمين.\n   - بناء مجتمع متعلم داخل المدرسة."
+          }
+        ]
+      },
+      
+      quiz2: {
+        title: "المستوى الثاني - التصميم والتخطيط (الفصل 2)",
+        mcq: [
+          {
+            q: "ما هي أول خطوة في عملية تصميم مركز مصادر التعلم؟",
+            options: [
+              "شراء الأثاث",
+              "دراسة الاحتياجات وتحليلها",
+              "طلاء الجدران",
+              "تعيين الموظفين"
+            ],
+            correct: 1,
+            explanation: "أول خطوة هي دراسة الاحتياجات وتحليلها لتحديد متطلبات المركز بناءً على المستفيدين والأهداف."
+          },
+          {
+            q: "ما المساحة الموصى بها لكل طالب في مركز مصادر التعلم؟",
+            options: [
+              "1 متر مربع",
+              "2-2.5 متر مربع",
+              "4 أمتار مربعة",
+              "5 أمتار مربعة"
+            ],
+            correct: 1,
+            explanation: "المساحة الموصى بها هي 2-2.5 متر مربع لكل طالب لتوفير مساحة كافية للحركة والاستخدام المريح للمصادر."
+          },
+          {
+            q: "أي من المواقع التالية يعتبر أنسب لمركز مصادر التعلم؟",
+            options: [
+              "مكان مركزي يسهل الوصول إليه",
+              "مكان بعيد عن الفصول الدراسية",
+              "مكان بجوار الملعب الرياضي",
+              "مكان في الطابق العلوي بعيد عن الضوضاء"
+            ],
+            correct: 0,
+            explanation: "يجب أن يكون المركز في مكان مركزي يسهل الوصول إليه من جميع الفصول الدراسية."
+          },
+          {
+            q: "ما أهمية الإضاءة الطبيعية في المركز؟",
+            options: [
+              "توفير في استهلاك الكهرباء فقط",
+              "تحسين المظهر الجمالي",
+              "توفير إضاءة صحية وتوفير في الطاقة",
+              "لا أهمية لها"
+            ],
+            correct: 2,
+            explanation: "الإضاءة الطبيعية توفر إضاءة صحية للعين كما تساعد في توفير استهلاك الطاقة."
+          },
+          {
+            q: "ما هي درجة الإضاءة المناسبة للقراءة في المركز؟",
+            options: [
+              "50-100 لوكس",
+              "100-200 لوكس",
+              "300-500 لوكس",
+              "600-800 لوكس"
+            ],
+            correct: 2,
+            explanation: "درجة الإضاءة المناسبة للقراءة تتراوح بين 300-500 لوكس للحفاظ على صحة العينين."
+          },
+          {
+            q: "أي الألوان التالية يعتبر أنسب لجدران المركز؟",
+            options: [
+              "الأحمر القاني",
+              "الأصفر الفاتح",
+              "الأخضر الغامق",
+              "الأسود"
+            ],
+            correct: 1,
+            explanation: "الألوان الفاتحة مثل الأصفر الفاتح أو الكريمي تعطي إحساساً بالاتساع والهدوء النفسي."
+          },
+          {
+            q: "ما هي نسبة المساحة المخصصة للممرات في المركز؟",
+            options: [
+              "10% من المساحة الكلية",
+              "20-25% من المساحة الكلية",
+              "30-35% من المساحة الكلية",
+              "40% من المساحة الكلية"
+            ],
+            correct: 1,
+            explanation: "يجب تخصيص 20-25% من المساحة الكلية للممرات لتسهيل الحركة."
+          },
+          {
+            q: "ما هو نوع الأثاث المناسب للقراءة الفردية؟",
+            options: [
+              "طاولات دائرية كبيرة",
+              "طاولات فردية بمساند للذراعين",
+              "مقاعد بلا طاولات",
+              "أرائك طويلة"
+            ],
+            correct: 1,
+            explanation: "الطاولات الفردية بمساند للذراعين هي الأكثر ملاءمة للقراءة الفردية."
+          },
+          {
+            q: "ما هي درجة حرارة الغرفة المناسبة في المركز؟",
+            options: [
+              "18-20 درجة مئوية",
+              "22-24 درجة مئوية",
+              "26-28 درجة مئوية",
+              "30-32 درجة مئوية"
+            ],
+            correct: 1,
+            explanation: "درجة الحرارة المناسبة تتراوح بين 22-24 درجة مئوية للراحة والتركيز."
+          },
+          {
+            q: "ما أهمية التهوية الجيدة في المركز؟",
+            options: [
+              "للحفاظ على صحة المستفيدين",
+              "للحفاظ على المصادر من التلف",
+              "لتوفير جو تعليمي مريح",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "التهوية الجيدة مهمة لصحة المستفيدين، حفظ المصادر، وتوفير جو تعليمي مريح."
+          },
+          {
+            q: "ما هي معايير اختيار أثاث المركز؟",
+            options: [
+              "الراحة والمتانة",
+              "المرونة والقابلية للتعديل",
+              "التناسب مع حجم المستفيدين",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "يجب أن يجمع الأثاث بين الراحة، المتانة، المرونة، والتناسب مع حجم المستفيدين."
+          },
+          {
+            q: "ما أهمية تقسيم المركز إلى مناطق مختلفة؟",
+            options: [
+              "لتخصيص مساحات للأنشطة المختلفة",
+              "لتنظيم حركة المستفيدين",
+              "لخلق بيئة مناسبة لكل نشاط",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "التقسيم يساعد في تخصيص مساحات مناسبة، تنظيم الحركة، وخلق بيئة ملائمة لكل نشاط."
+          },
+          {
+            q: "ما هي المرحلة الأولى في تخطيط المركز؟",
+            options: [
+              "الدراسة والتحليل",
+              "البناء والتجهيز",
+              "الشراء والتوفير",
+              "التشغيل والاختبار"
+            ],
+            correct: 0,
+            explanation: "المرحلة الأولى هي الدراسة والتحليل لتحديد الاحتياجات والمتطلبات."
+          },
+          {
+            q: "ما الذي يجب دراسته في مرحلة التحليل؟",
+            options: [
+              "احتياجات المستفيدين",
+              "المناهج الدراسية",
+              "الموارد المتاحة",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "يجب دراسة احتياجات المستفيدين، المناهج الدراسية، والموارد المتاحة."
+          },
+          {
+            q: "ما هي عناصر التصميم الهندسي للمركز؟",
+            options: [
+              "توزيع المساحات الداخلية",
+              "تصميم الإضاءة والتهوية",
+              "تخطيط مواقع الأقسام",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "يشمل التصميم الهندسي توزيع المساحات، تصميم الإضاءة والتهوية، وتخطيط مواقع الأقسام."
+          },
+          {
+            q: "ما أهمية تحديد مواقع المخارج في التصميم؟",
+            options: [
+              "للسلامة والأمان",
+              "لتسهيل الإخلاء في حالات الطوارئ",
+              "لتنظيم حركة الدخول والخروج",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "تحديد المخارج مهم للسلامة، تسهيل الإخلاء، وتنظيم حركة الدخول والخروج."
+          },
+          {
+            q: "ما هي الخطوة الأولى في تجهيز المركز؟",
+            options: [
+              "شراء الأثاث والمعدات",
+              "توفير المصادر المعلوماتية",
+              "تركيب الأجهزة والتقنيات",
+              "تنظيم المصادر وفهرستها"
+            ],
+            correct: 0,
+            explanation: "الخطوة الأولى في التجهيز هي شراء الأثاث والمعدات الأساسية."
+          },
+          {
+            q: "ما أهمية تنظيم المصادر وفهرستها؟",
+            options: [
+              "لتسهيل الوصول إليها",
+              "لمتابعة حركة الاستعارة",
+              "لحفظ حقوق الملكية",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "التنظيم والفهرسة يسهلان الوصول للمصادر، متابعة الاستعارة، وحفظ الحقوق."
+          },
+          {
+            q: "ما هي الاعتبارات الصحية في تصميم المركز؟",
+            options: [
+              "الإضاءة الكافية",
+              "التهوية الجيدة",
+              "التباعد بين المقاعد",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "الاعتبارات الصحية تشمل الإضاءة الكافية، التهوية الجيدة، والتباعد المناسب."
+          },
+          {
+            q: "ما هو النظام المناسب للإضاءة في المركز؟",
+            options: [
+              "إضاءة مركزية فقط",
+              "إضاءة موضعية فقط",
+              "مزيج من الإضاءة المركزية والموضعية",
+              "لا حاجة لإضاءة خاصة"
+            ],
+            correct: 2,
+            explanation: "الأفضل هو مزيج من الإضاءة المركزية للإضاءة العامة والموضعية للمساحات الخاصة."
+          },
+          {
+            q: "ما أهمية الأرضيات في المركز؟",
+            options: [
+              "للراحة والسلامة",
+              "للعزل الصوتي",
+              "للمظهر الجمالي",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "الأرضيات مهمة للراحة والسلامة، العزل الصوتي، والمظهر الجمالي."
+          },
+          {
+            q: "ما هي معايير اختيار الكراسي في المركز؟",
+            options: [
+              "الراحة والدعم الصحي للظهر",
+              "القدرة على التحمل",
+              "التناسب مع طول الطالب",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "يجب أن تكون الكراسي مريحة، صحية، متينة، ومناسبة لأطوال الطلاب."
+          },
+          {
+            q: "كيف يمكن توفير الخصوصية في مناطق القراءة؟",
+            options: [
+              "باستخدام فواصل بين المقاعد",
+              "بتصميم كبائن فردية",
+              "بتوزيع المقاعد بشكل مناسب",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "يمكن توفير الخصوصية باستخدام فواصل، كبائن فردية، وتوزيع مناسب للمقاعد."
+          },
+          {
+            q: "ما أهمية وجود مساحات للعمل الجماعي؟",
+            options: [
+              "لتشجيع التعلم التعاوني",
+              "لتنفيذ المشاريع الجماعية",
+              "لتنمية مهارات العمل الجماعي",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "المساحات الجماعية تشجع التعلم التعاوني، تنفيذ المشاريع، وتنمية مهارات العمل الجماعي."
+          },
+          {
+            q: "ما هي الاعتبارات الأمنية في تصميم المركز؟",
+            options: [
+              "نظام إنذار للحريق",
+              "كاميرات مراقبة",
+              "نظام تأمين للمصادر القيمة",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "الاعتبارات الأمنية تشمل نظام إنذار، كاميرات مراقبة، وتأمين المصادر القيمة."
+          },
+          {
+            q: "كيف يمكن جعل المركز صديقاً للبيئة؟",
+            options: [
+              "باستخدام مواد بناء صديقة للبيئة",
+              "بتوفير إضاءة طبيعية",
+              "باستخدام أثاث معاد تدويره",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "يمكن جعل المركز صديقاً للبيئة باستخدام مواد بناء وإضاءة طبيعية وأثاث معاد تدويره."
+          },
+          {
+            q: "ما أهمية وجود مساحات تخزين مناسبة؟",
+            options: [
+              "لتنظيم المصادر غير المستخدمة",
+              "لحفظ المعدات والأجهزة",
+              "لتنظيم المواد الاستهلاكية",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "مساحات التخزين مهمة لتنظيم المصادر غير المستخدمة، حفظ المعدات، والمواد الاستهلاكية."
+          },
+          {
+            q: "ما هي معايير تصميم منطقة الحاسوب؟",
+            options: [
+              "توفير مساحة كافية لكل جهاز",
+              "توفير مخارج كهربائية آمنة",
+              "التنظيم الجيد للأسلاك",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "معايير منطقة الحاسوب تشمل المساحة الكافية، مخارج كهربائية آمنة، وتنظيم الأسلاك."
+          },
+          {
+            q: "كيف يمكن تحسين جودة الصوت في المركز؟",
+            options: [
+              "باستخدام مواد عازلة للصوت",
+              "بتصميم أسقف عازلة",
+              "بوضع السجاد على الأرضيات",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "يمكن تحسين جودة الصوت باستخدام مواد عازلة، أسقف عازلة، والسجاد على الأرضيات."
+          },
+          {
+            q: "ما أهمية وجود مكتب استقبال في المركز؟",
+            options: [
+              "لتسهيل عملية التسجيل",
+              "لتقديم المساعدة للمستفيدين",
+              "لمراقبة الدخول والخروج",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "مكتب الاستقبال يسهل التسجيل، يقدم المساعدة، ويراقب الدخول والخروج."
+          },
+          {
+            q: "ما هي اعتبارات تصميم منطقة الوسائط المتعددة؟",
+            options: [
+              "توفير عزل صوتي جيد",
+              "توفير إضاءة قابلة للتعتيم",
+              "توفير شاشات عرض مناسبة",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "منطقة الوسائط المتعددة تحتاج عزل صوتي، إضاءة قابلة للتعتيم، وشاشات عرض مناسبة."
+          },
+          {
+            q: "كيف يمكن توفير إمكانية الوصول لذوي الاحتياجات الخاصة؟",
+            options: [
+              "بتوفير مداخل مناسبة",
+              "بتصميم ممرات واسعة",
+              "بتوفير مرافق مخصصة",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "يجب توفير مداخل مناسبة، ممرات واسعة، ومرافق مخصصة لذوي الاحتياجات الخاصة."
+          },
+          {
+            q: "ما أهمية وجود نظام تكييف مناسب؟",
+            options: [
+              "لراحة المستفيدين",
+              "لحماية المصادر من الرطوبة",
+              "لتحقيق بيئة تعلم مثالية",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "نظام التكييف المناسب مهم لراحة المستفيدين، حماية المصادر، وتحقيق بيئة تعلم مثالية."
+          },
+          {
+            q: "ما هي معايير تصميم منطقة الإعارة؟",
+            options: [
+              "موقع مركزي وسهل الوصول",
+              "مساحة كافية للانتظار",
+              "نظام تخزين منظم",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "منطقة الإعارة تحتاج موقعاً مركزياً، مساحة انتظار، ونظام تخزين منظم."
+          },
+          {
+            q: "كيف يمكن تحسين البيئة البصرية في المركز؟",
+            options: [
+              "باستخدام ألوان هادئة",
+              "بتوفير إضاءة كافية",
+              "باستخدام النباتات الداخلية",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "يمكن تحسين البيئة البصرية باستخدام ألوان هادئة، إضاءة كافية، ونباتات داخلية."
+          },
+          {
+            q: "ما أهمية وجود مساحات خارجية مرتبطة بالمركز؟",
+            options: [
+              "للاستراحة والتغيير",
+              "للأنشطة الخارجية",
+              "لتحسين التهوية والإضاءة",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "المساحات الخارجية مفيدة للراحة، الأنشطة الخارجية، وتحسين التهوية والإضاءة."
+          },
+          {
+            q: "ما هي اعتبارات السلامة من الحريق؟",
+            options: [
+              "توفير طفايات الحريق",
+              "تحديد مخارج الطوارئ",
+              "توفير نظام إنذار",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "اعتبارات السلامة من الحريق تشمل توفير طفايات، مخارج طوارئ، ونظام إنذار."
+          },
+          {
+            q: "كيف يمكن توفير المرونة في تصميم المركز؟",
+            options: [
+              "باستخدام أثاث متحرك",
+              "بتصميم مساحات متعددة الاستخدام",
+              "باستخدام فواصل قابلة للتعديل",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "المرونة تتحقق باستخدام أثاث متحرك، مساحات متعددة الاستخدام، وفواصل قابلة للتعديل."
+          },
+          {
+            q: "ما أهمية دراسة تدفق الحركة في المركز؟",
+            options: [
+              "لتنظيم حركة المستفيدين",
+              "لضمان سهولة الوصول",
+              "لمنع التزاحم",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "دراسة تدفق الحركة تساعد في تنظيم حركة المستفيدين، ضمان سهولة الوصول، ومنع التزاحم."
+          },
+          {
+            q: "ما هي معايير نجاح التصميم؟",
+            options: [
+              "تحقيق الأهداف التعليمية",
+              "تلبية احتياجات المستفيدين",
+              "المرونة والقابلية للتطوير",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "نجاح التصميم يقاس بتحقيق الأهداف التعليمية، تلبية الاحتياجات، والمرونة والتطوير."
+          }
+        ],
+        essay: [
+          {
+            q: "ما هي معايير تصميم مركز مصادر التعلم؟ اذكر ستة معايير مع شرح كل منها.",
+            modelAnswer: "معايير تصميم مركز مصادر التعلم:\n\n1. المساحة المناسبة:\n   - توفير 2-2.5 متر مربع لكل طالب.\n   - تخصيص مساحات للأقسام المختلفة.\n   - مراعاة المساحات الإضافية للممرات.\n\n2. الموقع المناسب:\n   - مكان مركزي يسهل الوصول إليه.\n   - بعيد عن مصادر الضوضاء.\n   - قريب من الفصول الدراسية.\n\n3. التقسيم الداخلي:\n   - مناطق للقراءة الفردية.\n   - مناطق للعمل الجماعي.\n   - مناطق لاستخدام الحاسوب.\n   - منطقة للإعارة والاستقبال.\n\n4. الإضاءة:\n   - إضاءة طبيعية وصناعية كافية.\n   - درجة إضاءة 300-500 لوكس للقراءة.\n   - توزيع الإضاءة بشكل متساوٍ.\n\n5. التهوية:\n   - نظام تهوية جيد.\n   - تجديد الهواء باستمرار.\n   - درجة حرارة 22-24 درجة مئوية.\n\n6. الأثاث:\n   - أثاث مريح وقابل للتعديل.\n   - تنوع في أنواع المقاعد والطاولات.\n   - أثاث مناسب لأعمار المستفيدين.\n\n7. الألوان:\n   - استخدام ألوان هادئة ومريحة.\n   - ألوان فاتحة تعطي إحساساً بالاتساع.\n   - تجنب الألوان الصارخة.\n\n8. السلامة:\n   - توفير طفايات حريق.\n   - تحديد مخارج الطوارئ.\n   - إجراءات أمنية مناسبة.\n   - نظام إنذار للحريق.\n\n9. المرونة:\n   - أثاث متحرك وقابل للتعديل.\n   - مساحات متعددة الاستخدام.\n   - قابلية التوسع والتطوير."
+          },
+          {
+            q: "ما هي خطوات التخطيط لمركز مصادر التعلم؟ اذكر واشرح ثلاث مراحل رئيسية.",
+            modelAnswer: "خطوات التخطيط لمركز مصادر التعلم:\n\nالمرحلة الأولى: الدراسة والتحليل\n1. دراسة احتياجات المستفيدين:\n   - تحليل احتياجات الطلاب حسب المرحلة الدراسية.\n   - دراسة احتياجات المعلمين والإداريين.\n   - تحديد الاحتياجات الخاصة (ذوي الاحتياجات الخاصة).\n\n2. تحليل المناهج الدراسية:\n   - تحديد الموضوعات التي تحتاج دعمًا.\n   - تحليل مصادر التعلم المطلوبة.\n   - تحديد الأنشطة التعليمية المناسبة.\n\n3. دراسة الموارد المتاحة:\n   - الموارد المالية.\n   - الموارد البشرية.\n   - الموارد المادية (المساحة، التجهيزات).\n\nالمرحلة الثانية: التصميم الهندسي\n1. تحديد المساحة الكلية:\n   - حساب المساحة المطلوبة بناءً على عدد المستفيدين.\n   - توزيع المساحات الداخلية.\n\n2. تصميم النظام الإنشائي:\n   - تصميم نظام الإضاءة.\n   - تصميم نظام التهوية.\n   - تصميم النظام الكهربائي.\n\n3. تخطيط مواقع الأقسام:\n   - توزيع الأقسام بشكل منطقي.\n   - تخطيط حركة المستفيدين.\n   - تحديد مواقع الخدمات.\n\nالمرحلة الثالثة: تجهيز المركز\n1. شراء الأثاث والمعدات:\n   - اختيار أثاث مناسب.\n   - شراء الأجهزة والتقنيات.\n   - توفير أنظمة الأمن والسلامة.\n\n2. توفير المصادر المعلوماتية:\n   - شراء الكتب والدوريات.\n   - توفير الوسائط المتعددة.\n   - توفير المصادر الإلكترونية.\n\n3. تركيب وتنظيم:\n   - تركيب الأجهزة والتقنيات.\n   - تنظيم المصادر وفهرستها.\n   - تجهيز السجلات والنماذج.\n\n4. التشغيل التجريبي:\n   - اختبار التجهيزات.\n   - تدريب العاملين.\n   - اكتشاف المشكلات ومعالجتها."
+          },
+          {
+            q: "ما هي الاعتبارات الصحية والبيئية في تصميم المركز؟ اذكر خمس اعتبارات مع شرح كل منها.",
+            modelAnswer: "الاعتبارات الصحية والبيئية في تصميم المركز:\n\n1. الإضاءة الصحية:\n   - توفير إضاءة طبيعية كافية.\n   - استخدام إضاءة صناعية غير مضرة للعين.\n   - تجنب الوهج والانعكاسات.\n   - توفير إضاءة موضعية للمساحات الخاصة.\n\n2. التهوية وجودة الهواء:\n   - نظام تهوية فعال.\n   - تجديد الهواء باستمرار.\n   - مراقبة جودة الهواء.\n   - استخدام فلاتر الهواء إن أمكن.\n\n3. الراحة الحرارية:\n   - درجة حرارة مناسبة (22-24°م).\n   - رطوبة نسبية مناسبة (40-60%).\n   - نظام تكييف هادئ.\n   - تجنب التيارات الهوائية المباشرة.\n\n4. السلامة من الضوضاء:\n   - استخدام مواد عازلة للصوت.\n   - تصميم عزل بين المناطق المختلفة.\n   - توفير مساحات هادئة للقراءة.\n   - تقليل مصادر الضوضاء الداخلية.\n\n5. الأثاث الصحي:\n   - كراسي ذات دعم صحي للظهر.\n   - طاولات بارتفاع مناسب.\n   - أثاث قابل للتعديل.\n   - مواد غير سامة وصديقة للبيئة.\n\n6. النظافة والصحة:\n   - مواد بناء سهلة التنظيف.\n   - توفير مرافق نظافة مناسبة.\n   - نظام تنظيف منتظم.\n   - تجنب المواد المسببة للحساسية.\n\n7. البيئة الخضراء:\n   - استخدام النباتات الداخلية.\n   - توفير إضاءة طبيعية.\n   - استخدام مواد معاد تدويرها.\n   - ترشيد استهلاك الطاقة والماء.\n\n8. السلامة من الحريق:\n   - استخدام مواد مقاومة للحريق.\n   - توفير مخارج طوارئ واضحة.\n   - نظام إنذار للحريق.\n   - تدريب على إجراءات الطوارئ.\n\n9. الوصولية:\n   - تصميم مناسب لذوي الاحتياجات الخاصة.\n   - ممرات واسعة وآمنة.\n   - مرافق مخصصة.\n   - سهولة الوصول لجميع المناطق."
+          }
+        ]
+      },
+      
+      quiz3: {
+        title: "المستوى الثالث - الإدارة والتشغيل (الفصل 3)",
+        mcq: [
+          {
+            q: "ما هي المهام التنظيمية لأمين مركز مصادر التعلم؟",
+            options: [
+              "تنظيم المصادر وفهرستها فقط",
+              "التصنيف والترتيب فقط",
+              "جميع ما سبق بالإضافة إلى تحديث السجلات",
+              "مساعدة المستفيدين فقط"
+            ],
+            correct: 2,
+            explanation: "المهام التنظيمية تشمل تنظيم المصادر، الفهرسة، التصنيف، الترتيب، وتحديث السجلات."
+          },
+          {
+            q: "ما هي المهام الخدمية لأمين المركز؟",
+            options: [
+              "مساعدة المستفيدين في البحث",
+              "الإرشاد والتدريب",
+              "إدارة عمليات الإعارة",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "المهام الخدمية تشمل مساعدة المستفيدين، الإرشاد، التدريب، وإدارة الإعارة."
+          },
+          {
+            q: "ما هو الفرق بين الإعارة الداخلية والخارجية؟",
+            options: [
+              "الداخلية داخل المركز فقط، والخارجية خارج المركز",
+              "لا فرق بينهما",
+              "الداخلية للطلاب والخارجية للمعلمين",
+              "الداخلية مجانية والخارجية مدفوعة"
+            ],
+            correct: 0,
+            explanation: "الإعارة الداخلية تستخدم المصادر داخل المركز فقط، بينما الخارجية تسمح بإخراج المصادر."
+          },
+          {
+            q: "ما هي مدة الإعارة القياسية للكتاب في المركز؟",
+            options: [
+              "أسبوع واحد",
+              "أسبوعين",
+              "ثلاثة أسابيع",
+              "شهر كامل"
+            ],
+            correct: 1,
+            explanation: "المدة القياسية للإعارة هي أسبوعين قابلة للتجديد."
+          },
+          {
+            q: "ما هو نظام الإعارة الإلكتروني؟",
+            options: [
+              "نظام يدوي لتسجيل الإعارة",
+              "برنامج حاسوبي لإدارة عمليات الإعارة",
+              "نظام شفوي فقط",
+              "لا يوجد نظام إلكتروني"
+            ],
+            correct: 1,
+            explanation: "نظام الإعارة الإلكتروني هو برنامج حاسوبي متخصص لتسجيل ومتابعة عمليات الإعارة."
+          },
+          {
+            q: "ما هي سياسات الإعارة؟",
+            options: [
+              "تحديد فترة الإعارة فقط",
+              "تحديد عدد المصادر المسموح استعارتها",
+              "تحديد الغرامات والاستثناءات",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "سياسات الإعارة تشمل تحديد فترة الإعارة، عدد المصادر، الغرامات، والاستثناءات."
+          },
+          {
+            q: "ما هي المهام التطويرية لأمين المركز؟",
+            options: [
+              "تطوير مجموعات المركز",
+              "تحديث المصادر القديمة",
+              "اقتراح مصادر جديدة",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "المهام التطويرية تشمل تطوير المجموعات، تحديث المصادر، واقتراح مصادر جديدة."
+          },
+          {
+            q: "ما هي المهام الإدارية لأمين المركز؟",
+            options: [
+              "إعداد التقارير",
+              "المتابعة والتقييم",
+              "التخطيط للمستقبل",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "المهام الإدارية تشمل إعداد التقارير، المتابعة، التقييم، والتخطيط."
+          },
+          {
+            q: "ما هي المهام التقنية لأمين المركز؟",
+            options: [
+              "صيانة الأجهزة",
+              "تحديث البرامج",
+              "إدارة الشبكات",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "المهام التقنية تشمل صيانة الأجهزة، تحديث البرامج، وإدارة الشبكات."
+          },
+          {
+            q: "ما هي المهام التعليمية لأمين المركز؟",
+            options: [
+              "تنظيم ورش العمل",
+              "إعداد الدروس النموذجية",
+              "تدريب المستفيدين",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "المهام التعليمية تشمل تنظيم ورش العمل، إعداد الدروس، وتدريب المستفيدين."
+          },
+          {
+            q: "ما هو دور أمين المركز في تنظيم الأنشطة؟",
+            options: [
+              "التخطيط للأنشطة",
+              "تنفيذ الأنشطة",
+              "تقييم الأنشطة",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "دور أمين المركز يشمل التخطيط، التنفيذ، والتقييم للأنشطة."
+          },
+          {
+            q: "كيف يساهم أمين المركز في تطوير مهارات المستفيدين؟",
+            options: [
+              "بتدريبهم على البحث",
+              "بتعليمهم استخدام المصادر",
+              "بتنمية مهاراتهم المعلوماتية",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "يساهم أمين المركز في تطوير مهارات المستفيدين بالتدريب على البحث، استخدام المصادر، والمهارات المعلوماتية."
+          },
+          {
+            q: "ما أهمية الاحتفاظ بسجلات دقيقة في المركز؟",
+            options: [
+              "للمتابعة والتقييم",
+              "للتخطيط والتطوير",
+              "للمساءلة والمحاسبة",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "السجلات الدقيقة مهمة للمتابعة، التقييم، التخطيط، التطوير، والمساءلة."
+          },
+          {
+            q: "ما هي أنواع التقارير التي يعدها أمين المركز؟",
+            options: [
+              "تقارير دورية عن الاستخدام",
+              "تقارير عن الأنشطة",
+              "تقارير الميزانية",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "يعد أمين المركز تقارير عن الاستخدام، الأنشطة، والميزانية."
+          },
+          {
+            q: "كيف يدير أمين المركز شكاوى المستفيدين؟",
+            options: [
+              "بتسجيلها بدقة",
+              "بدراستها وتحليلها",
+              "باتخاذ الإجراءات المناسبة",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "يدير أمين المركز الشكاوى بتسجيلها، دراستها، واتخاذ الإجراءات المناسبة."
+          },
+          {
+            q: "ما هو دور أمين المركز في تطوير السياسات؟",
+            options: [
+              "اقتراح سياسات جديدة",
+              "مراجعة السياسات الحالية",
+              "تطبيق السياسات",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "دور أمين المركز يشمل اقتراح، مراجعة، وتطبيق السياسات."
+          },
+          {
+            q: "كيف يساهم أمين المركز في بناء المجتمع المدرسي؟",
+            options: [
+              "بتنظيم فعاليات مشتركة",
+              "بتشجيع المشاركة",
+              "ببناء شراكات داخل المدرسة",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "يساهم أمين المركز في بناء المجتمع المدرسي بتنظيم فعاليات، تشجيع المشاركة، وبناء شراكات."
+          },
+          {
+            q: "ما أهمية التدريب المستمر لأمين المركز؟",
+            options: [
+              "لتطوير مهاراته",
+              "لمواكبة التطورات",
+              "لتحسين الخدمات",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "التدريب المستمر مهم لتطوير المهارات، مواكبة التطورات، وتحسين الخدمات."
+          },
+          {
+            q: "كيف يدير أمين المركز الوقت بشكل فعال؟",
+            options: [
+              "بوضع جدول زمني",
+              "بتحديد الأولويات",
+              "بتفويض المهام",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "يدير أمين المركز الوقت بوضع جدول زمني، تحديد أولويات، وتفويض المهام."
+          },
+          {
+            q: "ما هي مهارات الاتصال المطلوبة لأمين المركز؟",
+            options: [
+              "الاستماع الجيد",
+              "التواصل الفعال",
+              "القدرة على الشرح",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "مهارات الاتصال تشمل الاستماع الجيد، التواصل الفعال، والقدرة على الشرح."
+          },
+          {
+            q: "كيف يحافظ أمين المركز على جودة الخدمات؟",
+            options: [
+              "بالمتابعة المستمرة",
+              "بالتقييم الدوري",
+              "بالتطوير المستمر",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "يحافظ أمين المركز على الجودة بالمتابعة، التقييم، والتطوير المستمر."
+          },
+          {
+            q: "ما هو دور أمين المركز في التخطيط للمستقبل؟",
+            options: [
+              "دراسة الاحتياجات المستقبلية",
+              "وضع خطط التطوير",
+              "تحديد الموارد المطلوبة",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "دور أمين المركز في التخطيط يشمل دراسة الاحتياجات، وضع خطط، وتحديد الموارد."
+          },
+          {
+            q: "كيف يدير أمين المركز الموارد المالية؟",
+            options: [
+              "بوضع ميزانية واقعية",
+              "بترشيد الإنفاق",
+              "بتوثيق المصروفات",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "يدير أمين المركز الموارد المالية بوضع ميزانية، ترشيد إنفاق، وتوثيق مصروفات."
+          },
+          {
+            q: "ما أهمية العمل الجماعي لأمين المركز؟",
+            options: [
+              "لتحقيق أهداف المركز",
+              "لتطوير الخدمات",
+              "لبناء بيئة عمل إيجابية",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "العمل الجماعي مهم لتحقيق الأهداف، تطوير الخدمات، وبناء بيئة عمل إيجابية."
+          },
+          {
+            q: "كيف يتعامل أمين المركز مع التحديات؟",
+            options: [
+              "بتحليل المشكلة",
+              "بوضع حلول مبتكرة",
+              "بتنفيذ الحلول",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "يتعامل أمين المركز مع التحديات بتحليل المشكلة، وضع حلول مبتكرة، وتنفيذها."
+          },
+          {
+            q: "ما هي صفات أمين المركز الناجح؟",
+            options: [
+              "حب المعرفة",
+              "القدرة على التنظيم",
+              "المهارات التقنية",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "صفات أمين المركز الناجح تشمل حب المعرفة، القدرة على التنظيم، والمهارات التقنية."
+          },
+          {
+            q: "كيف يقيم أمين المركز أداء المركز؟",
+            options: [
+              "بجمع البيانات",
+              "بتحليل النتائج",
+              "بوضع مؤشرات أداء",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "يقيم أمين المركز الأداء بجمع البيانات، تحليل النتائج، ووضع مؤشرات أداء."
+          },
+          {
+            q: "ما أهمية الابتكار في عمل أمين المركز؟",
+            options: [
+              "لتطوير الخدمات",
+              "لتحسين الإجراءات",
+              "لمواكبة التطورات",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "الابتكار مهم لتطوير الخدمات، تحسين الإجراءات، ومواكبة التطورات."
+          },
+          {
+            q: "كيف يطور أمين المركز مهاراته القيادية؟",
+            options: [
+              "بالتدريب المستمر",
+              "بالممارسة العملية",
+              "بالتعلم من الخبرات",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "يطور أمين المركز مهاراته القيادية بالتدريب، الممارسة، والتعلم من الخبرات."
+          },
+          {
+            q: "ما هو دور أمين المركز في الحفاظ على الأمن؟",
+            options: [
+              "مراقبة دخول وخروج المصادر",
+              "تطبيق إجراءات الأمن",
+              "تدريب المستفيدين على السلامة",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "دور أمين المركز في الأمن يشمل المراقبة، تطبيق الإجراءات، والتدريب على السلامة."
+          },
+          {
+            q: "كيف يدير أمين المركز التغيير؟",
+            options: [
+              "بالتخطيط الجيد",
+              "بالتواصل الفعال",
+              "بالتدريب المناسب",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "يدير أمين المركز التغيير بالتخطيط، التواصل، والتدريب المناسب."
+          },
+          {
+            q: "ما أهمية الشفافية في عمل أمين المركز؟",
+            options: [
+              "لبناء الثقة",
+              "للمساءلة",
+              "لتحسين الخدمات",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "الشفافية مهمة لبناء الثقة، المساءلة، وتحسين الخدمات."
+          },
+          {
+            q: "كيف يوازن أمين المركز بين المهام المختلفة؟",
+            options: [
+              "بتحديد الأولويات",
+              "بتنظيم الوقت",
+              "بتفويض المهام",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "يوازن أمين المركز بين المهام بتحديد أولويات، تنظيم وقت، وتفويض مهام."
+          },
+          {
+            q: "ما هي تحديات عمل أمين المركز؟",
+            options: [
+              "قلة الموارد",
+              "التطور التكنولوجي السريع",
+              "تنوع احتياجات المستفيدين",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "تحديات عمل أمين المركز تشمل قلة الموارد، التطور التكنولوجي، وتنوع الاحتياجات."
+          },
+          {
+            q: "كيف يتعامل أمين المركز مع الضغوط؟",
+            options: [
+              "بتنظيم العمل",
+              "بطلب الدعم",
+              "بأخذ فترات راحة",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "يتعامل أمين المركز مع الضغوط بتنظيم العمل، طلب الدعم، وأخذ فترات راحة."
+          },
+          {
+            q: "ما أهمية التعلم المستمر لأمين المركز؟",
+            options: [
+              "لتطوير المعرفة",
+              "لمواكبة المستجدات",
+              "لتحسين المهارات",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "التعلم المستمر مهم لتطوير المعرفة، مواكبة المستجدات، وتحسين المهارات."
+          },
+          {
+            q: "كيف يقيم أمين المركز رضا المستفيدين؟",
+            options: [
+              "باستبيانات الرضا",
+              "بالمقابلات الشخصية",
+              "بمراقبة السلوك",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "يقيم أمين المركز الرضا باستبيانات، مقابلات، ومراقبة السلوك."
+          },
+          {
+            q: "ما هو دور أمين المركز في التطوير المهني للمعلمين؟",
+            options: [
+              "بتدريبهم على استخدام المصادر",
+              "بمشاركتهم في ورش العمل",
+              "بتقديم الاستشارات",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "دور أمين المركز في تطوير المعلمين يشمل التدريب، المشاركة في ورش العمل، وتقديم الاستشارات."
+          },
+          {
+            q: "كيف يساهم أمين المركز في البحث العلمي؟",
+            options: [
+              "بتوفير مصادر بحثية",
+              "بتدريب الباحثين",
+              "بمساعدتهم في المنهجية",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "يساهم أمين المركز في البحث العلمي بتوفير مصادر، تدريب باحثين، ومساعدتهم في المنهجية."
+          },
+          {
+            q: "ما هي القيم الأخلاقية لأمين المركز؟",
+            options: [
+              "النزاهة والشفافية",
+              "الاحترام والعدالة",
+              "المسؤولية والالتزام",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "القيم الأخلاقية تشمل النزاهة، الشفافية، الاحترام، العدالة، المسؤولية، والالتزام."
+          },
+          {
+            q: "كيف يحافظ أمين المركز على سرية معلومات المستفيدين؟",
+            options: [
+              "بعدم الكشف عن السجلات",
+              "بحماية قواعد البيانات",
+              "بتطبيق سياسات الخصوصية",
+              "جميع ما سبق"
+            ],
+            correct: 3,
+            explanation: "يحافظ أمين المركز على السرية بعدم الكشف عن السجلات، حماية قواعد البيانات، وتطبيق سياسات الخصوصية."
+          }
+        ],
+        essay: [
+          {
+            q: "ما هي مهام أمين مركز مصادر التعلم؟ اذكر واشرح خمس فئات من المهام.",
+            modelAnswer: "مهام أمين مركز مصادر التعلم:\n\n1. المهام التنظيمية:\n   - فهرسة وتصنيف المصادر المعلوماتية.\n   - ترتيب الكتب والمصادر على الرفوف.\n   - تحديث السجلات والفهارس.\n   - تنظيم عمليات الجرد والدوران.\n   - إدارة نظام التصنيف والفهرسة.\n\n2. المهام الخدمية:\n   - استقبال المستفيدين وتوجيههم.\n   - مساعدتهم في البحث عن المعلومات.\n   - الإجابة على استفساراتهم.\n   - تدريبهم على استخدام المصادر.\n   - إدارة عمليات الإعارة والإرجاع.\n\n3. المهام الإدارية:\n   - إعداد الخطط والتقارير.\n   - إدارة الميزانية والمشتريات.\n   - متابعة أعمال الصيانة.\n   - إدارة العاملين (إن وجدوا).\n   - تطبيق الأنظمة واللوائح.\n\n4. المهام التطويرية:\n   - تطوير مجموعات المصادر.\n   - اقتراح مصادر جديدة للشراء.\n   - تحديث المصادر القديمة.\n   - تطوير الخدمات والأنشطة.\n   - تطوير المهارات المهنية.\n\n5. المهام التعليمية:\n   - تنظيم ورش العمل والدورات.\n   - إعداد دروس نموذجية.\n   - تدريب المعلمين على استخدام المركز.\n   - تنمية مهارات البحث لدى الطلاب.\n   - تنظيم الأنشطة الثقافية والعلمية.\n\n6. المهام التقنية:\n   - صيانة الأجهزة والمعدات.\n   - تحديث البرامج والتقنيات.\n   - إدارة الشبكات وقواعد البيانات.\n   - تدريب المستفيدين على التقنيات.\n   - حل المشكلات التقنية.\n\n7. المهام التواصلية:\n   - بناء شراكات مع مؤسسات أخرى.\n   - التواصل مع أولياء الأمور.\n   - التنسيق مع المعلمين.\n   - تمثيل المركز في المناسبات.\n   - نشر أنشطة المركز وإنجازاته."
+          },
+          {
+            q: "ما هي نظم الإعارة والتداول في مركز مصادر التعلم؟ اذكر واشرح أربعة أنظمة.",
+            modelAnswer: "نظم الإعارة والتداول في مركز مصادر التعلم:\n\n1. نظام الإعارة الداخلية:\n   - التعريف: استخدام المصادر داخل المركز فقط.\n   - التطبيق: للكتب المرجعية، الموسوعات، الدوريات الحالية.\n   - المزايا: ضمان وجود المصادر للمستفيدين الآخرين.\n   - الإجراءات: تسجيل الاستخدام، تحديد مدة الاستخدام.\n   - الرقابة: مراقبة استخدام المصادر داخل المركز.\n\n2. نظام الإعارة الخارجية:\n   - التعريف: استعارة المصادر خارج المركز لفترة محددة.\n   - التطبيق: للكتب العادية، الوسائط المتعددة.\n   - المدة: أسبوعين قابلة للتجديد.\n   - الإجراءات: تسجيل البيانات، تحديد موعد الإرجاع.\n   - المتابعة: تذكير المستفيدين بمواعيد الإرجاع.\n\n3. نظام الإعارة الجماعية:\n   - التعريف: إعارة مجموعة من المصادر لفريق أو فصل دراسي.\n   - التطبيق: للمشاريع الجماعية، الأنشطة الصفية.\n   - المدة: حسب طبيعة النشاط.\n   - الإجراءات: تحديد مسئول عن المجموعة.\n   - المتابعة: متابعة استخدام المجموعة للمصادر.\n\n4. نظام الإعارة بين المكتبات:\n   - التعريف: تبادل المصادر بين المراكز والمكتبات.\n   - التطبيق: للمصادر النادرة أو غير المتوفرة.\n   - المدة: حسب الاتفاق بين المؤسسات.\n   - الإجراءات: تنسيق مع المكتبات الأخرى.\n   - المتابعة: متابعة حركة المصادر المستعارة.\n\n5. نظام الإعارة الإلكتروني:\n   - التعريف: استخدام برامج حاسوبية لإدارة الإعارة.\n   - التطبيق: تسجيل جميع عمليات الإعارة إلكترونياً.\n   - المزايا: السرعة، الدقة، سهولة المتابعة.\n   - الإجراءات: مسح باركود المصادر والمستفيدين.\n   - التقارير: إصدار تقارير إحصائية تلقائياً.\n\n6. نظام التداول الداخلي:\n   - التعريف: تبادل المصادر بين أقسام المركز.\n   - التطبيق: لنقل المصادر حسب الاحتياج.\n   - الإجراءات: تسجيل حركة النقل.\n   - المتابعة: متابعة تواجد المصادر في الأقسام.\n   - التحديث: تحديث سجلات التواجد.\n\n7. سياسات الإعارة:\n   - فترة الإعارة: تختلف حسب نوع المصدر.\n   - عدد المصادر: تحديد الحد الأقصى للاستعارة.\n   - التجديد: شروط وإجراءات تجديد الإعارة.\n   - الغرامات: نظام الغرامات للتأخير.\n   - الاستثناءات: حالات خاصة تستحق معاملة مختلفة.\n\n8. نظام المتابعة:\n   - تذكير: إرسال تذكيرات بمواعيد الإرجاع.\n   - إنذار: إصدار إنذارات للمتأخرين.\n   - تعليق: تعليق امتياز الإعارة للمخالفين.\n   - تقارير: إعداد تقارير دورية عن حركة الإعارة.\n   - تحليل: تحليل إحصاءات الإعارة للتطوير."
+          },
+          {
+            q: "ما هي المهارات المطلوبة لأمين مركز مصادر التعلم؟ اذكر واشرح ست مهارات أساسية.",
+            modelAnswer: "المهارات المطلوبة لأمين مركز مصادر التعلم:\n\n1. المهارات التنظيمية:\n   - القدرة على تنظيم المصادر وفهرستها.\n   - مهارة الترتيب والتصنيف.\n   - إدارة الوقت وتنظيم المهام.\n   - تنظيم المساحات والتجهيزات.\n   - إدارة السجلات والوثائق.\n\n2. المهارات التقنية:\n   - إتقان استخدام الحاسوب والبرامج.\n   - مهارات صيانة الأجهزة البسيطة.\n   - إدارة قواعد البيانات.\n   - استخدام الإنترنت والمصادر الإلكترونية.\n   - التعامل مع التقنيات الحديثة.\n\n3. المهارات الاتصالية:\n   - مهارات الاستماع الفعال.\n   - القدرة على الشرح والتوضيح.\n   - مهارات التوجيه والإرشاد.\n   - التواصل مع فئات عمرية مختلفة.\n   - إدارة الحوار والنقاش.\n\n4. المهارات البحثية:\n   - معرفة مصادر المعلومات المختلفة.\n   - مهارات البحث في قواعد البيانات.\n   - تقييم جودة المصادر.\n   - تجميع وتنظيم المعلومات.\n   - تقديم المعلومات بشكل مناسب.\n\n5. المهارات الإدارية:\n   - التخطيط وتنفيذ الخطط.\n   - إدارة الميزانية والمشتريات.\n   - إعداد التقارير والتقويم.\n   - اتخاذ القرارات.\n   - حل المشكلات.\n\n6. المهارات التعليمية:\n   - تصميم وتنفيذ الأنشطة التعليمية.\n   - تدريب المستفيدين على المهارات.\n   - إعداد المواد التعليمية.\n   - تقييم التعلم والتقدم.\n   - التكيف مع أساليب تعلم مختلفة.\n\n7. المهارات الشخصية:\n   - الصبر والتحمل.\n   - الدقة والاهتمام بالتفاصيل.\n   - المرونة والتكيف.\n   - المبادرة والابتكار.\n   - العمل بروح الفريق.\n\n8. المهارات القيادية:\n   - القدرة على التأثير والإقناع.\n   - تحفيز الآخرين.\n   - إدارة التغيير.\n   - بناء العلاقات.\n   - تمثيل المركز.\n\n9. المهارات الأخلاقية:\n   - النزاهة والشفافية.\n   - احترام الخصوصية.\n   - العدالة والمساواة.\n   - المسؤولية والالتزام.\n   - الاحترام والتقدير.\n\n10. المهارات التطويرية:\n    - التعلم المستمر.\n    - مواكبة التطورات.\n    - البحث عن التحسين.\n    - التجديد والتطوير.\n    - الابتكار والإبداع.\n\nتطوير المهارات:\n- التدريب المستمر والدورات.\n- المشاركة في المؤتمرات وورش العمل.\n- القراءة والمطالعة المستمرة.\n- التبادل الخبرات مع الزملاء.\n- الممارسة العملية والتجريب.\n- التقييم الذاتي وتلقي التغذية الراجعة."
+          }
+        ]
+      }
+    };
+
+    // ================ المتغيرات العامة ================
+    let currentQuiz = '';
+    let currentQuestion = 0;
+    let currentEssayQuestion = 0;
+    let score = 0;
+    let userAnswers = [];
+    let essayAnswers = [];
+
+    // ================ عرض الصفحات ================
+    function showPage(pageId) {
+      // تحديث الأزرار النشطة
+      document.querySelectorAll('.nav-tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      event.target.classList.add('active');
+      
+      // إخفاء جميع الصفحات
+      document.getElementById('summaryPage').style.display = 'none';
+      document.getElementById('testsPage').style.display = 'none';
+      document.getElementById('quizContainer').style.display = 'none';
+      document.getElementById('essayContainer').style.display = 'none';
+      document.getElementById('resultsContainer').style.display = 'none';
+      
+      // عرض الصفحة المطلوبة
+      if (pageId === 'summary') {
+        document.getElementById('summaryPage').style.display = 'block';
+      } else if (pageId === 'tests') {
+        document.getElementById('testsPage').style.display = 'block';
+      }
+    }
+
+    // ================ بدء الاختبار ================
+    function startQuiz(quizId) {
+      currentQuiz = quizId;
+      currentQuestion = 0;
+      currentEssayQuestion = 0;
+      score = 0;
+      userAnswers = [];
+      essayAnswers = [];
+      
+      document.getElementById('homePage').style.display = 'none';
+      document.getElementById('quizContainer').style.display = 'block';
+      document.getElementById('essayContainer').style.display = 'none';
+      document.getElementById('resultsContainer').style.display = 'none';
+      
+      loadQuestion();
+    }
+
+    // ================ تحميل السؤال الاختياري ================
+    function loadQuestion() {
+      const quiz = quizzes[currentQuiz];
+      const question = quiz.mcq[currentQuestion];
+      
+      document.getElementById('qNumber').textContent = currentQuestion + 1;
+      document.getElementById('qTotal').textContent = quiz.mcq.length;
+      
+      // تحديث شريط التقدم
+      const progress = ((currentQuestion) / quiz.mcq.length) * 100;
+      document.getElementById('quizProgress').style.width = progress + '%';
+      document.getElementById('progressText').textContent = `التقدم: ${Math.round(progress)}%`;
+      
+      document.getElementById('qText').textContent = question.q;
+      
+      const optionsContainer = document.getElementById('optionsContainer');
+      optionsContainer.innerHTML = '';
+      
+      question.options.forEach((option, index) => {
+        const button = document.createElement('button');
+        button.className = 'option-btn';
+        button.textContent = option;
+        button.onclick = () => selectOption(index);
+        optionsContainer.appendChild(button);
+      });
+      
+      document.getElementById('explanation').style.display = 'none';
+      document.getElementById('btnNext').style.display = 'none';
+      document.getElementById('btnNext').textContent = 'التالي';
+      document.getElementById('btnNext').onclick = nextQuestion;
+    }
+
+    // ================ اختيار الإجابة ================
+    function selectOption(selectedIndex) {
+      const quiz = quizzes[currentQuiz];
+      const question = quiz.mcq[currentQuestion];
+      const options = document.querySelectorAll('.option-btn');
+      const explanation = document.getElementById('explanation');
+      const btnNext = document.getElementById('btnNext');
+      
+      // تسجيل إجابة المستخدم
+      userAnswers.push({
+        question: question.q,
+        selected: selectedIndex,
+        correct: question.correct,
+        explanation: question.explanation,
+        userAnswer: question.options[selectedIndex],
+        correctAnswer: question.options[question.correct]
+      });
+      
+      // تلوين الإجابات
+      options.forEach((btn, index) => {
+        btn.disabled = true;
+        if (index === question.correct) {
+          btn.classList.add('correct');
+        } else if (index === selectedIndex && index !== question.correct) {
+          btn.classList.add('incorrect');
+        }
+      });
+      
+      // إظهار التفسير
+      explanation.textContent = question.explanation;
+      explanation.style.display = 'block';
+      
+      // تحديث النقاط
+      if (selectedIndex === question.correct) {
+        score++;
+      }
+      
+      // إظهار زر التالي
+      btnNext.style.display = 'block';
+      
+      // إذا كان السؤال الأخير، تغيير نص الزر
+      if (currentQuestion === quiz.mcq.length - 1) {
+        btnNext.textContent = 'الانتقال للأسئلة المقالية';
+      }
+    }
+
+    // ================ السؤال التالي ================
+    function nextQuestion() {
+      const quiz = quizzes[currentQuiz];
+      
+      if (currentQuestion < quiz.mcq.length - 1) {
+        currentQuestion++;
+        loadQuestion();
+      } else {
+        showEssayQuestions();
+      }
+    }
+
+    // ================ الانتقال للأسئلة المقالية ================
+    function showEssayQuestions() {
+      document.getElementById('quizContainer').style.display = 'none';
+      document.getElementById('essayContainer').style.display = 'block';
+      loadEssayQuestion();
+    }
+
+    // ================ تحميل السؤال المقالي ================
+    function loadEssayQuestion() {
+      const quiz = quizzes[currentQuiz];
+      const question = quiz.essay[currentEssayQuestion];
+      
+      document.getElementById('eNumber').textContent = currentEssayQuestion + 1;
+      document.getElementById('eTotal').textContent = quiz.essay.length;
+      
+      // تحديث شريط التقدم
+      const progress = ((currentEssayQuestion) / quiz.essay.length) * 100;
+      document.getElementById('essayProgress').style.width = progress + '%';
+      document.getElementById('essayProgressText').textContent = `التقدم: ${Math.round(progress)}%`;
+      
+      document.getElementById('eText').textContent = question.q;
+      document.getElementById('essayAnswer').value = essayAnswers[currentEssayQuestion] || '';
+      document.getElementById('modelAnswer').style.display = 'none';
+      document.getElementById('modelAnswer').innerHTML = '';
+      
+      // تحديث حالة زر التحقق
+      const btnCheck = document.getElementById('btnCheck');
+      if (essayAnswers[currentEssayQuestion]) {
+        btnCheck.textContent = 'إظهار الإجابة النموذجية';
+        btnCheck.onclick = showModelAnswer;
+      } else {
+        btnCheck.textContent = 'تحقق من الإجابة';
+        btnCheck.onclick = checkEssayAnswer;
+      }
+    }
+
+    // ================ التحقق من الإجابة المقالية ================
+    function checkEssayAnswer() {
+      const answer = document.getElementById('essayAnswer').value.trim();
+      if (!answer) {
+        alert('يرجى كتابة إجابتك أولاً');
+        return;
+      }
+      
+      // حفظ الإجابة
+      essayAnswers[currentEssayQuestion] = answer;
+      
+      // عرض الإجابة النموذجية
+      showModelAnswer();
+    }
+
+    // ================ عرض الإجابة النموذجية ================
+    function showModelAnswer() {
+      const quiz = quizzes[currentQuiz];
+      const question = quiz.essay[currentEssayQuestion];
+      const modelAnswerDiv = document.getElementById('modelAnswer');
+      
+      modelAnswerDiv.innerHTML = `
+        <h4>الإجابة النموذجية:</h4>
+        <div style="white-space: pre-line; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; margin-top: 10px;">
+          ${question.modelAnswer}
+        </div>
+        <div style="margin-top: 15px; padding: 10px; background: rgba(255,107,53,0.1); border-radius: 8px; border-right: 3px solid var(--accent-orange);">
+          <strong>ملاحظة:</strong> قارن إجابتك بالنموذج وحاول تحديد نقاط القوة والضعف في إجابتك.
+        </div>
+      `;
+      modelAnswerDiv.style.display = 'block';
+      
+      // تحديث زر التحقق
+      document.getElementById('btnCheck').textContent = 'إخفاء الإجابة النموذجية';
+      document.getElementById('btnCheck').onclick = function() {
+        if (modelAnswerDiv.style.display === 'none') {
+          modelAnswerDiv.style.display = 'block';
+          this.textContent = 'إخفاء الإجابة النموذجية';
+        } else {
+          modelAnswerDiv.style.display = 'none';
+          this.textContent = 'إظهار الإجابة النموذجية';
+        }
+      };
+    }
+
+    // ================ السؤال المقالي التالي ================
+    function nextEssayQuestion() {
+      const quiz = quizzes[currentQuiz];
+      
+      // حفظ الإجابة الحالية
+      essayAnswers[currentEssayQuestion] = document.getElementById('essayAnswer').value;
+      
+      if (currentEssayQuestion < quiz.essay.length - 1) {
+        currentEssayQuestion++;
+        loadEssayQuestion();
+      }
+    }
+
+    // ================ السؤال المقالي السابق ================
+    function prevEssayQuestion() {
+      if (currentEssayQuestion > 0) {
+        // حفظ الإجابة الحالية
+        essayAnswers[currentEssayQuestion] = document.getElementById('essayAnswer').value;
+        
+        currentEssayQuestion--;
+        loadEssayQuestion();
+      }
+    }
+
+    // ================ العودة للأسئلة الاختيارية ================
+    function showMultipleChoice() {
+      document.getElementById('essayContainer').style.display = 'none';
+      document.getElementById('quizContainer').style.display = 'block';
+    }
+
+    // ================ إنهاء الاختبار وعرض النتائج ================
+    function finishQuiz() {
+      // حفظ الإجابة المقالية الأخيرة
+      essayAnswers[currentEssayQuestion] = document.getElementById('essayAnswer').value;
+      
+      document.getElementById('essayContainer').style.display = 'none';
+      document.getElementById('resultsContainer').style.display = 'block';
+      
+      const quiz = quizzes[currentQuiz];
+      
+      document.getElementById('resultQuizTitle').textContent = `نتائجك في اختبار ${quiz.title}`;
+      
+      const resultsList = document.getElementById('resultsList');
+      resultsList.innerHTML = '';
+      
+      // عرض ملخص النتائج
+      const summary = document.createElement('div');
+      summary.className = 'result-summary';
+      summary.innerHTML = `
+        <h3>الملخص العام</h3>
+        <div style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 1rem; margin: 1.5rem 0;">
+          <div style="text-align: center; padding: 1rem; background: rgba(76,175,80,0.2); border-radius: 10px; min-width: 150px;">
+            <div style="font-size: 2rem; font-weight: bold; color: #4caf50;">${score}</div>
+            <div>الدرجة في الأسئلة الاختيارية</div>
+            <div style="font-size: 0.9rem; opacity: 0.8;">من ${quiz.mcq.length}</div>
+          </div>
+          <div style="text-align: center; padding: 1rem; background: rgba(33,150,243,0.2); border-radius: 10px; min-width: 150px;">
+            <div style="font-size: 2rem; font-weight: bold; color: #2196f3;">${Math.round((score/quiz.mcq.length)*100)}%</div>
+            <div>النسبة المئوية</div>
+            <div style="font-size: 0.9rem; opacity: 0.8;">للأسئلة الاختيارية</div>
+          </div>
+          <div style="text-align: center; padding: 1rem; background: rgba(255,107,53,0.2); border-radius: 10px; min-width: 150px;">
+            <div style="font-size: 2rem; font-weight: bold; color: var(--accent-orange);">${quiz.essay.length}</div>
+            <div>الأسئلة المقالية</div>
+            <div style="font-size: 0.9rem; opacity: 0.8;">تم الإجابة عليها</div>
+          </div>
+        </div>
+      `;
+      resultsList.appendChild(summary);
+      
+      // عرض النتائج التفصيلية للأسئلة الاختيارية
+      const mcqSection = document.createElement('div');
+      mcqSection.innerHTML = '<h3 style="margin-top: 2rem; color: var(--accent-orange);">الأسئلة الاختيارية</h3>';
+      resultsList.appendChild(mcqSection);
+      
+      userAnswers.forEach((answer, index) => {
+        const item = document.createElement('div');
+        item.className = 'result-item';
+        
+        const isCorrect = answer.selected === answer.correct;
+        
+        item.innerHTML = `
+          <div class="result-question">${index + 1}. ${answer.question}</div>
+          <div>
+            إجابتك: 
+            <span class="result-answer ${isCorrect ? 'answer-correct' : 'answer-incorrect'}">
+              ${answer.userAnswer}
+            </span>
+            ${!isCorrect ? `<br>الإجابة الصحيحة: <span class="result-answer answer-correct">${answer.correctAnswer}</span>` : ''}
+          </div>
+          <div class="result-explanation">${answer.explanation}</div>
+        `;
+        
+        resultsList.appendChild(item);
+      });
+      
+      // عرض الأسئلة المقالية
+      const essaySection = document.createElement('div');
+      essaySection.innerHTML = '<h3 style="margin-top: 2rem; color: var(--accent-orange);">الأسئلة المقالية</h3>';
+      resultsList.appendChild(essaySection);
+      
+      quizzes[currentQuiz].essay.forEach((question, index) => {
+        const item = document.createElement('div');
+        item.className = 'result-item';
+        
+        item.innerHTML = `
+          <div class="result-question">السؤال المقالي ${index + 1}: ${question.q}</div>
+          <div style="margin: 1rem 0;">
+            <strong>إجابتك:</strong>
+            <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px; margin-top: 0.5rem; white-space: pre-line;">
+              ${essayAnswers[index] || 'لم يتم الإجابة'}
+            </div>
+          </div>
+          <div style="margin: 1rem 0;">
+            <strong>الإجابة النموذجية:</strong>
+            <div style="background: rgba(76,175,80,0.1); padding: 1rem; border-radius: 8px; margin-top: 0.5rem; white-space: pre-line;">
+              ${question.modelAnswer}
+            </div>
+          </div>
+        `;
+        
+        resultsList.appendChild(item);
+      });
+      
+      // إضافة الأزرار
+      const buttonsContainer = document.createElement('div');
+      buttonsContainer.style.display = 'flex';
+      buttonsContainer.style.justifyContent = 'center';
+      buttonsContainer.style.gap = '1rem';
+      buttonsContainer.style.flexWrap = 'wrap';
+      buttonsContainer.style.marginTop = '2rem';
+      
+      const downloadBtn = document.createElement('button');
+      downloadBtn.className = 'btn-download';
+      downloadBtn.innerHTML = '<i class="fas fa-download"></i> تحميل النتائج PDF';
+      downloadBtn.onclick = downloadResults;
+      
+      const restartBtn = document.createElement('button');
+      restartBtn.className = 'btn-action btn-restart';
+      restartBtn.innerHTML = '<i class="fas fa-redo"></i> إعادة الاختبار';
+      restartBtn.onclick = () => startQuiz(currentQuiz);
+      
+      const homeBtn = document.createElement('button');
+      homeBtn.className = 'btn-action btn-home';
+      homeBtn.innerHTML = '<i class="fas fa-home"></i> العودة للرئيسية';
+      homeBtn.onclick = goHome;
+      
+      buttonsContainer.appendChild(downloadBtn);
+      buttonsContainer.appendChild(restartBtn);
+      buttonsContainer.appendChild(homeBtn);
+      
+      resultsList.appendChild(buttonsContainer);
+    }
+
+    // ================ تحميل النتائج PDF ================
+    function downloadResults() {
+      const element = document.getElementById('resultsContainer');
+      const opt = {
+        margin: 1,
+        filename: `نتائج_اختبار_${quizzes[currentQuiz].title}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'cm', format: 'a4', orientation: 'portrait' }
+      };
+      
+      html2pdf().set(opt).from(element).save();
+    }
+
+    // ================ العودة للرئيسية ================
+    function goHome() {
+      document.getElementById('homePage').style.display = 'block';
+      document.getElementById('quizContainer').style.display = 'none';
+      document.getElementById('essayContainer').style.display = 'none';
+      document.getElementById('resultsContainer').style.display = 'none';
+      document.getElementById('summaryPage').style.display = 'block';
+      document.getElementById('testsPage').style.display = 'none';
+      
+      // تحديث الأزرار النشطة
+      document.querySelectorAll('.nav-tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      document.querySelector('.nav-tab').classList.add('active');
+    }
+
+    // ================ تبديل الوضع النهاري/الليلي ================
+    document.addEventListener('DOMContentLoaded', function() {
+      const themeToggle = document.createElement('button');
+      themeToggle.className = 'theme-toggle-btn';
+      themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+      themeToggle.onclick = toggleTheme;
+      document.body.appendChild(themeToggle);
+    });
+
+    function toggleTheme() {
+      const root = document.documentElement;
+      const isDayMode = root.classList.contains('day-mode');
+      const icon = document.querySelector('.theme-toggle-btn i');
+      
+      if (isDayMode) {
+        root.classList.remove('day-mode');
+        icon.className = 'fas fa-moon';
+      } else {
+        root.classList.add('day-mode');
+        icon.className = 'fas fa-sun';
+      }
+    }
+  </script>
+</body>
+</html>
